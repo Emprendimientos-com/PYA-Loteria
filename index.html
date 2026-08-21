@@ -6,8 +6,11 @@
   <title>PYA - Gran Rifa Exclusiva</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+  
+  <!-- Carga de SDK Firebase estable (v8.10.1) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -256,14 +259,15 @@
   </div>
 
   <script>
-    const ADMIN_WHATSAPP = '573000000000';
+    // CAMBIA ESTE NÚMERO POR TU NÚMERO REAL CON CÓDIGO DE PAÍS (57 para Colombia)
+    const ADMIN_WHATSAPP = '573000000000'; 
     let selectedNumbers = [];
     let occupiedNumbers = {};
 
-    const ADMIN_USER_B64 = 'YWRtaW4=';
-    const ADMIN_PASS_B64 = 'cHlhMTIz';
+    const ADMIN_USER_B64 = 'YWRtaW4='; // Usuario: admin
+    const ADMIN_PASS_B64 = 'cHlhMTIz'; // Clave: pya123
 
-    // ---- Conexión a Firebase (base de datos compartida en tiempo real) ----
+    // Conexión a Firebase Realtime Database
     const firebaseConfig = {
       apiKey: "AIzaSyBAnWbrKHwf4oPObeZPhhxBv-8LalwIGBU",
       authDomain: "pya-rifas.firebaseapp.com",
@@ -273,13 +277,14 @@
       messagingSenderId: "292674445176",
       appId: "1:292674445176:web:aaa9977e42afb506b6728d"
     };
-    firebase.initializeApp(firebaseConfig);
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.database();
     const ocupadosRef = db.ref('ocupados');
 
-    // Esta función escucha la base de datos en TODO momento.
-    // Apenas alguien (en cualquier parte del mundo) aparte o libere un número,
-    // esta función se dispara sola y actualiza la pantalla de todos en tiempo real.
+    // Escuchador en tiempo real de cambios en la base de datos
     ocupadosRef.on('value', (snapshot) => {
       occupiedNumbers = snapshot.val() || {};
       renderGrid();
@@ -369,9 +374,6 @@
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<span>Verificando...</span>';
 
-      // Justo antes de guardar, consultamos la base de datos "en vivo" una
-      // última vez, por si alguien más apartó uno de estos números en los
-      // últimos segundos (mientras llenabas el formulario).
       let current;
       try {
         const snapshot = await ocupadosRef.once('value');
