@@ -6,6 +6,8 @@
   <title>PYA - Gran Rifa Exclusiva</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -256,15 +258,35 @@
   <script>
     const ADMIN_WHATSAPP = '573000000000';
     let selectedNumbers = [];
-    let occupiedNumbers = JSON.parse(localStorage.getItem('pya_occupied_numbers')) || {};
+    let occupiedNumbers = {};
 
     const ADMIN_USER_B64 = 'YWRtaW4=';
     const ADMIN_PASS_B64 = 'cHlhMTIz';
 
-    function saveOccupiedToStorage() {
-      localStorage.setItem('pya_occupied_numbers', JSON.stringify(occupiedNumbers));
-      updateStats();
-    }
+    // ---- Conexión a Firebase (base de datos compartida en tiempo real) ----
+    const firebaseConfig = {
+      apiKey: "AIzaSyBAnWbrKHwf4oPObeZPhhxBv-8LalwIGBU",
+      authDomain: "pya-rifas.firebaseapp.com",
+      databaseURL: "https://pya-rifas-default-rtdb.firebaseio.com",
+      projectId: "pya-rifas",
+      storageBucket: "pya-rifas.firebasestorage.app",
+      messagingSenderId: "292674445176",
+      appId: "1:292674445176:web:aaa9977e42afb506b6728d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const ocupadosRef = db.ref('ocupados');
+
+    // Esta función escucha la base de datos en TODO momento.
+    // Apenas alguien (en cualquier parte del mundo) aparte o libere un número,
+    // esta función se dispara sola y actualiza la pantalla de todos en tiempo real.
+    ocupadosRef.on('value', (snapshot) => {
+      occupiedNumbers = snapshot.val() || {};
+      renderGrid();
+      if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) {
+        renderAdminTable();
+      }
+    });
 
     function updateStats() {
       const occupiedCount = Object.keys(occupiedNumbers).length;
@@ -337,24 +359,66 @@
       document.getElementById('modal-checkout').classList.remove('flex');
     }
 
-    function handleReserva(e) {
+    async function handleReserva(e) {
       e.preventDefault();
-
-      const confirmar = confirm(`¿Seguro son todos los números que escogerás? (${selectedNumbers.join(', ')})\nPor favor, verifica tus datos antes de continuar.`);
-      if (!confirmar) return;
 
       const name = document.getElementById('user-name').value.trim();
       const phone = document.getElementById('user-phone').value.trim();
 
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Verificando...</span>';
+
+      // Justo antes de guardar, consultamos la base de datos "en vivo" una
+      // última vez, por si alguien más apartó uno de estos números en los
+      // últimos segundos (mientras llenabas el formulario).
+      let current;
+      try {
+        const snapshot = await ocupadosRef.once('value');
+        current = snapshot.val() || {};
+      } catch (err) {
+        alert('No se pudo conectar con la base de datos. Revisa tu internet e inténtalo de nuevo.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
+        return;
+      }
+
+      const conflictos = selectedNumbers.filter(n => current[n]);
+
+      if (conflictos.length > 0) {
+        occupiedNumbers = current;
+        selectedNumbers = selectedNumbers.filter(n => !conflictos.includes(n));
+        renderGrid();
+        updateCartBar();
+        closeCheckoutModal();
+        alert(`¡Justo a tiempo! Los siguientes números ya fueron apartados por otra persona hace un instante: ${conflictos.join(', ')}.\n\nLos quitamos de tu selección. Por favor elige otros números.`);
+        return;
+      }
+
+      const confirmar = confirm(`¿Seguro son todos los números que escogerás? (${selectedNumbers.join(', ')})\nPor favor, verifica tus datos antes de continuar.`);
+      if (!confirmar) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
+        return;
+      }
+
+      const updates = {};
       selectedNumbers.forEach(num => {
-        occupiedNumbers[num] = {
+        updates[num] = {
           nombre: name,
           telefono: phone,
           fecha: new Date().toLocaleDateString()
         };
       });
 
-      saveOccupiedToStorage();
+      try {
+        await ocupadosRef.update(updates);
+      } catch (err) {
+        alert('Ocurrió un error al guardar tu reserva. Inténtalo de nuevo.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
+        return;
+      }
 
       const mensaje = `Hola PYA, quiero hacer la reserva de mis boletas:%0A%0A` +
         `👤 *Nombre:* ${encodeURIComponent(name)}%0A` +
@@ -367,7 +431,8 @@
       selectedNumbers = [];
       closeCheckoutModal();
       updateCartBar();
-      renderGrid();
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
     }
 
     function openAdminModal() {
@@ -446,22 +511,16 @@
       if (!val) return;
 
       const formatted = val.padStart(2, '0');
-      occupiedNumbers[formatted] = {
+      ocupadosRef.child(formatted).set({
         nombre: 'Bloqueado Manualmente',
         telefono: 'N/A',
         fecha: new Date().toLocaleDateString()
-      };
-      saveOccupiedToStorage();
-      renderAdminTable();
-      renderGrid();
+      });
       document.getElementById('admin-block-num').value = '';
     }
 
     function adminLiberarNumero(num) {
-      delete occupiedNumbers[num];
-      saveOccupiedToStorage();
-      renderAdminTable();
-      renderGrid();
+      ocupadosRef.child(num).remove();
     }
 
     function buscarGanador() {
