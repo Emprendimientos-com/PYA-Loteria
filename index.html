@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PYA - Gran Rifa Exclusiva</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#08090c',
+              card: '#12141c',
+              cardHover: '#1a1d29',
+              gold: '#fbbf24',
+              goldDark: '#d97706',
+              accent: '#6366f1'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glassmorphism {
+      background: rgba(18, 20, 28, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glow-gold {
+      box-shadow: 0 0 25px -5px rgba(251, 191, 36, 0.3);
+    }
+    .grid-pattern {
+      background-size: 30px 30px;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="bg-brand-bg text-gray-100 min-h-screen font-sans flex flex-col justify-between grid-pattern">
+
+  <header class="py-4 px-6 md:px-12 border-b border-gray-800/80 glassmorphism sticky top-0 z-40 flex justify-between items-center shadow-2xl">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-amber-200 flex items-center justify-center font-black text-black text-xl shadow-lg shadow-amber-500/20">
+        P
+      </div>
+      <div>
+        <h1 class="text-xl font-black tracking-wider bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">
+          PYA RIFAS
+        </h1>
+        <p class="text-[10px] text-gray-400 font-medium tracking-widest uppercase">Sistema Oficial de Boletas</p>
+      </div>
+    </div>
+
+    <button onclick="openAdminModal()" class="flex items-center gap-2 text-xs font-semibold text-gray-300 hover:text-amber-400 transition-colors bg-gray-900/80 border border-gray-700/80 hover:border-amber-500/40 px-3.5 py-2 rounded-xl">
+      <i class="fa-solid fa-user-shield text-amber-400"></i>
+      <span>Admin</span>
+    </button>
+  </header>
+
+  <main class="max-w-6xl w-full mx-auto p-4 md:p-8 flex-grow space-y-10">
+    <section class="relative rounded-3xl p-6 md:p-10 border border-amber-500/30 glassmorphism overflow-hidden glow-gold">
+      <div class="absolute -top-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="space-y-4 text-center md:text-left max-w-xl">
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400">
+            <i class="fa-solid fa-trophy"></i> Gran Rifa Activa
+          </span>
+          <h2 class="text-3xl md:text-5xl font-black tracking-tight text-white leading-tight">
+            ¡Gana el Premio Mayor con <span class="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">PYA</span>!
+          </h2>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Selecciona tus números de la suerte en la lista interactiva. Entre más oportunidades asegures, más posibilidades tienes de ganar.
+          </p>
+        </div>
+
+        <div class="bg-black/40 border border-gray-800 rounded-2xl p-5 w-full md:w-64 text-center space-y-3">
+          <span class="text-xs text-gray-400 uppercase font-semibold">Estado de la Rifa</span>
+          <div class="flex justify-around items-center pt-1">
+            <div>
+              <p id="stat-disponibles" class="text-2xl font-black text-amber-400">100</p>
+              <p class="text-[10px] text-gray-400 uppercase">Libres</p>
+            </div>
+            <div class="w-px h-8 bg-gray-800"></div>
+            <div>
+              <p id="stat-ocupados" class="text-2xl font-black text-red-400">0</p>
+              <p class="text-[10px] text-gray-400 uppercase">Vendidos</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400 bg-brand-card/50 p-4 rounded-xl border border-gray-800/60">
+      <div class="flex items-center gap-2">
+        <span class="w-3.5 h-3.5 rounded-md bg-brand-card border border-gray-700"></span>
+        <span>Disponible</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-3.5 h-3.5 rounded-md bg-amber-500 shadow-sm shadow-amber-500"></span>
+        <span class="text-amber-400 font-medium">Seleccionado</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-3.5 h-3.5 rounded-md bg-red-950 border border-red-800 opacity-60"></span>
+        <span class="text-red-400">Ocupado / Vendido</span>
+      </div>
+    </section>
+
+    <section>
+      <div id="grid-numeros" class="grid grid-cols-5 sm:grid-cols-10 gap-2.5 md:gap-3.5"></div>
+    </section>
+  </main>
+
+  <div id="cart-bar" class="fixed bottom-0 left-0 right-0 glassmorphism p-4 md:p-5 border-t border-amber-500/20 transform translate-y-full transition-all duration-300 z-30 shadow-2xl">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold">
+          <i class="fa-solid fa-ticket"></i>
+        </div>
+        <div>
+          <p class="text-xs text-gray-400">Tus números seleccionados:</p>
+          <div id="selected-numbers-list" class="flex flex-wrap gap-1.5 mt-1"></div>
+        </div>
+      </div>
+      <button onclick="openCheckoutModal()" class="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-black font-extrabold px-8 py-3.5 rounded-xl shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2">
+        <i class="fa-brands fa-whatsapp text-lg"></i>
+        <span>Apartar por WhatsApp</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="modal-checkout" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-brand-card border border-gray-800 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl relative space-y-6">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-4">
+        <h3 class="text-xl font-black text-white flex items-center gap-2">
+          <i class="fa-solid fa-clipboard-check text-amber-400"></i> Confirmar Reserva
+        </h3>
+        <button onclick="closeCheckoutModal()" class="text-gray-500 hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      
+      <form id="form-reserva" onsubmit="handleReserva(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Nombre Completo</label>
+          <input type="text" id="user-name" required class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="Ej. Carlos Mendoza">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Teléfono Celular</label>
+          <input type="tel" id="user-phone" required class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="Ej. 3001234567">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Boleta(s) Reservada(s)</label>
+          <input type="text" id="user-numbers" readonly class="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-sm text-amber-400 font-bold" value="">
+        </div>
+
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeCheckoutModal()" class="w-1/2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold py-3 rounded-xl text-sm transition-all">Cancelar</button>
+          <button type="submit" class="w-1/2 bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2">
+            <span>Continuar</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-admin-login" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-brand-card border border-gray-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-6">
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mx-auto text-xl">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white">Acceso Administrador</h3>
+        <p class="text-xs text-gray-400">Ingresa las credenciales de gestión de PYA</p>
+      </div>
+
+      <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Usuario</label>
+          <input type="text" id="admin-user" required class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Contraseña</label>
+          <input type="password" id="admin-pass" required class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closeAdminModal()" class="w-1/2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold py-2.5 rounded-xl text-sm">Cerrar</button>
+          <button type="submit" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-lg shadow-indigo-600/30">Ingresar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-admin-dashboard" class="fixed inset-0 bg-black/90 backdrop-blur-lg hidden flex-col p-4 md:p-8 z-50 overflow-y-auto">
+    <div class="max-w-5xl mx-auto w-full space-y-6">
+      <div class="flex justify-between items-center bg-brand-card border border-gray-800 rounded-2xl p-6">
+        <div>
+          <h2 class="text-2xl font-black text-amber-400 flex items-center gap-2">
+            <i class="fa-solid fa-sliders"></i> Panel Admin PYA
+          </h2>
+          <p class="text-xs text-gray-400">Gestiona números y busca ganadores</p>
+        </div>
+        <button onclick="closeAdminDashboard()" class="bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition-all">
+          Cerrar Sesión
+        </button>
+      </div>
+
+      <div class="bg-gradient-to-r from-amber-500/10 to-amber-900/10 border border-amber-500/30 rounded-2xl p-6 space-y-4">
+        <h3 class="text-lg font-black text-amber-400 flex items-center gap-2">
+          <i class="fa-solid fa-trophy"></i> Consultar Número Ganador (Lotería del Valle)
+        </h3>
+        <div class="flex flex-col md:flex-row gap-4 items-end">
+          <div class="w-full md:w-1/2">
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Últimos 2 dígitos del resultado</label>
+            <input type="text" id="admin-winner-num" placeholder="Ej: 05, 42, 88" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
+          </div>
+          <button onclick="buscarGanador()" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-black font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Buscar Ganador</span>
+          </button>
+        </div>
+        <div id="winner-result" class="hidden p-4 rounded-xl border"></div>
+      </div>
+
+      <div class="bg-brand-card border border-gray-800 rounded-2xl p-6 flex flex-col md:flex-row gap-4 items-end">
+        <div class="w-full md:w-1/2">
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Marcar número como VENDIDO / OCUPADO (Manual)</label>
+          <input type="text" id="admin-block-num" placeholder="Ej: 05, 12, 99" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
+        </div>
+        <button onclick="adminBloquearNumero()" class="w-full md:w-auto bg-gray-800 hover:bg-gray-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all">
+          Marcar Ocupado
+        </button>
+      </div>
+
+      <div class="overflow-x-auto bg-brand-card rounded-2xl border border-gray-800">
+        <table class="w-full text-left text-sm text-gray-300">
+          <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
+            <tr>
+              <th class="p-4">Número</th>
+              <th class="p-4">Cliente</th>
+              <th class="p-4">Teléfono</th>
+              <th class="p-4">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_WHATSAPP = '573000000000';
+    let selectedNumbers = [];
+    let occupiedNumbers = JSON.parse(localStorage.getItem('pya_occupied_numbers')) || {};
+
+    const ADMIN_USER_B64 = 'YWRtaW4=';
+    const ADMIN_PASS_B64 = 'cHlhMTIz';
+
+    function saveOccupiedToStorage() {
+      localStorage.setItem('pya_occupied_numbers', JSON.stringify(occupiedNumbers));
+      updateStats();
+    }
+
+    function updateStats() {
+      const occupiedCount = Object.keys(occupiedNumbers).length;
+      document.getElementById('stat-ocupados').innerText = occupiedCount;
+      document.getElementById('stat-disponibles').innerText = 100 - occupiedCount;
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('grid-numeros');
+      grid.innerHTML = '';
+      
+      for (let i = 0; i < 100; i++) {
+        const numStr = i.toString().padStart(2, '0');
+        const isOccupied = !!occupiedNumbers[numStr];
+        const isSelected = selectedNumbers.includes(numStr);
+
+        const btn = document.createElement('button');
+        btn.innerText = numStr;
+        btn.disabled = isOccupied;
+
+        let baseStyle = "h-12 md:h-14 rounded-2xl font-black text-sm transition-all flex items-center justify-center border shadow-sm ";
+        
+        if (isOccupied) {
+          baseStyle += "bg-red-950/30 border-red-900/50 text-red-600 cursor-not-allowed opacity-50";
+        } else if (isSelected) {
+          baseStyle += "bg-gradient-to-tr from-amber-500 to-amber-400 border-amber-300 text-black shadow-lg shadow-amber-500/30 scale-105 z-10";
+        } else {
+          baseStyle += "bg-brand-card border-gray-800 hover:border-amber-500/50 hover:text-amber-400 text-gray-300 hover:scale-105";
+        }
+
+        btn.className = baseStyle;
+        btn.onclick = () => toggleNumberSelection(numStr);
+        grid.appendChild(btn);
+      }
+      updateStats();
+    }
+
+    function toggleNumberSelection(numStr) {
+      if (selectedNumbers.includes(numStr)) {
+        selectedNumbers = selectedNumbers.filter(n => n !== numStr);
+      } else {
+        selectedNumbers.push(numStr);
+      }
+      updateCartBar();
+      renderGrid();
+    }
+
+    function updateCartBar() {
+      const cartBar = document.getElementById('cart-bar');
+      const list = document.getElementById('selected-numbers-list');
+      
+      if (selectedNumbers.length > 0) {
+        cartBar.classList.remove('translate-y-full');
+        list.innerHTML = selectedNumbers.map(n => 
+          `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold px-2.5 py-1 rounded-lg text-xs">${n}</span>`
+        ).join('');
+      } else {
+        cartBar.classList.add('translate-y-full');
+      }
+    }
+
+    function openCheckoutModal() {
+      document.getElementById('user-numbers').value = selectedNumbers.join(', ');
+      document.getElementById('modal-checkout').classList.remove('hidden');
+      document.getElementById('modal-checkout').classList.add('flex');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('modal-checkout').classList.add('hidden');
+      document.getElementById('modal-checkout').classList.remove('flex');
+    }
+
+    function handleReserva(e) {
+      e.preventDefault();
+
+      const confirmar = confirm(`¿Seguro son todos los números que escogerás? (${selectedNumbers.join(', ')})\nPor favor, verifica tus datos antes de continuar.`);
+      if (!confirmar) return;
+
+      const name = document.getElementById('user-name').value.trim();
+      const phone = document.getElementById('user-phone').value.trim();
+
+      selectedNumbers.forEach(num => {
+        occupiedNumbers[num] = {
+          nombre: name,
+          telefono: phone,
+          fecha: new Date().toLocaleDateString()
+        };
+      });
+
+      saveOccupiedToStorage();
+
+      const mensaje = `Hola PYA, quiero hacer la reserva de mis boletas:%0A%0A` +
+        `👤 *Nombre:* ${encodeURIComponent(name)}%0A` +
+        `📱 *Teléfono:* ${encodeURIComponent(phone)}%0A` +
+        `🎟️ *Boleta(s):* ${selectedNumbers.join(', ')}%0A%0A` +
+        `Quedo atento a las instrucciones para enviar el comprobante de pago.`;
+
+      window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${mensaje}`, '_blank');
+
+      selectedNumbers = [];
+      closeCheckoutModal();
+      updateCartBar();
+      renderGrid();
+    }
+
+    function openAdminModal() {
+      document.getElementById('modal-admin-login').classList.remove('hidden');
+      document.getElementById('modal-admin-login').classList.add('flex');
+    }
+
+    function closeAdminModal() {
+      document.getElementById('modal-admin-login').classList.add('hidden');
+      document.getElementById('modal-admin-login').classList.remove('flex');
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      
+      const user = document.getElementById('admin-user').value.trim();
+      const pass = document.getElementById('admin-pass').value.trim();
+
+      const userB64 = btoa(user);
+      const passB64 = btoa(pass);
+
+      if (userB64 === ADMIN_USER_B64 && passB64 === ADMIN_PASS_B64) {
+        document.getElementById('admin-user').value = '';
+        document.getElementById('admin-pass').value = '';
+        closeAdminModal();
+        openAdminDashboard();
+      } else {
+        alert('Credenciales incorrectas');
+      }
+    }
+
+    function openAdminDashboard() {
+      document.getElementById('modal-admin-dashboard').classList.remove('hidden');
+      document.getElementById('modal-admin-dashboard').classList.add('flex');
+      renderAdminTable();
+    }
+
+    function closeAdminDashboard() {
+      document.getElementById('modal-admin-dashboard').classList.add('hidden');
+      document.getElementById('modal-admin-dashboard').classList.remove('flex');
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById('admin-table-body');
+      tbody.innerHTML = '';
+
+      const keys = Object.keys(occupiedNumbers);
+      if (keys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 text-xs">No hay números marcados como ocupados.</td></tr>`;
+        return;
+      }
+
+      keys.forEach(num => {
+        const data = occupiedNumbers[num];
+        const cliente = (typeof data === 'object') ? data.nombre : 'Bloqueado por Admin';
+        const telefono = (typeof data === 'object') ? data.telefono : 'N/A';
+
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-gray-800/60 hover:bg-gray-900/40";
+        tr.innerHTML = `
+          <td class="p-4 font-black text-amber-400 text-base">${num}</td>
+          <td class="p-4 text-white font-medium">${cliente}</td>
+          <td class="p-4 text-gray-400">${telefono}</td>
+          <td class="p-4">
+            <button onclick="adminLiberarNumero('${num}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-black border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+              Liberar
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function adminBloquearNumero() {
+      const val = document.getElementById('admin-block-num').value.trim();
+      if (!val) return;
+
+      const formatted = val.padStart(2, '0');
+      occupiedNumbers[formatted] = {
+        nombre: 'Bloqueado Manualmente',
+        telefono: 'N/A',
+        fecha: new Date().toLocaleDateString()
+      };
+      saveOccupiedToStorage();
+      renderAdminTable();
+      renderGrid();
+      document.getElementById('admin-block-num').value = '';
+    }
+
+    function adminLiberarNumero(num) {
+      delete occupiedNumbers[num];
+      saveOccupiedToStorage();
+      renderAdminTable();
+      renderGrid();
+    }
+
+    function buscarGanador() {
+      const input = document.getElementById('admin-winner-num').value.trim();
+      if (!input) return;
+
+      const numFormatted = input.padStart(2, '0');
+      const resContainer = document.getElementById('winner-result');
+      resContainer.classList.remove('hidden');
+
+      const data = occupiedNumbers[numFormatted];
+
+      if (!data) {
+        resContainer.className = "p-4 rounded-xl border bg-red-950/40 border-red-800 text-red-300 text-sm space-y-1";
+        resContainer.innerHTML = `
+          <p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> El número ${numFormatted} NO fue vendido / comprado.</p>
+          <p class="text-xs text-red-400">El premio queda vacante o acumula según las políticas de la rifa.</p>
+        `;
+        return;
+      }
+
+      const cliente = (typeof data === 'object') ? data.nombre : 'Sin nombre asignado';
+      const telefono = (typeof data === 'object') ? data.telefono : '';
+
+      let cleanPhone = telefono.replace(/\D/g, '');
+      if (cleanPhone.length === 10) {
+        cleanPhone = '57' + cleanPhone;
+      }
+
+      const mensajeGanador = `¡Hola ${cliente}! 🎉🥳%0A%0ATenemos excelentes noticias de *PYA RIFAS*. Tu número *${numFormatted}* ha sido el *GANADOR* del premio mayor con el resultado de la Lotería del Valle. 🏆%0A%0APor favor respóndenos a este mensaje para coordinar la entrega de tu premio.%0A%0A¡Muchas felicidades! 👏`;
+
+      resContainer.className = "p-4 rounded-xl border bg-emerald-950/40 border-emerald-800 text-emerald-200 text-sm space-y-3";
+      resContainer.innerHTML = `
+        <div class="flex items-center gap-2 font-bold text-emerald-400">
+          <i class="fa-solid fa-trophy text-amber-400 text-lg"></i>
+          <span>¡NÚMERO GANADOR ENCONTRADO!</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs bg-black/40 p-3 rounded-lg border border-emerald-800/50">
+          <p><strong class="text-gray-400">Boleta:</strong> <span class="text-amber-400 font-bold text-sm">${numFormatted}</span></p>
+          <p><strong class="text-gray-400">Ganador(a):</strong> <span class="text-white font-bold">${cliente}</span></p>
+          <p><strong class="text-gray-400">Teléfono:</strong> <span class="text-white font-bold">${telefono || 'N/A'}</span></p>
+        </div>
+        ${cleanPhone ? `
+          <a href="https://wa.me/${cleanPhone}?text=${mensajeGanador}" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/20">
+            <i class="fa-brands fa-whatsapp text-base"></i>
+            <span>Notificar Ganador por WhatsApp</span>
+          </a>
+        ` : `<p class="text-xs text-amber-400 font-semibold">Este número fue bloqueado manualmente y no tiene un teléfono registrado.</p>`}
+      `;
+    }
+
+    renderGrid();
+  </script>
+</body>
+</html>
