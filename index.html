@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PYA - Gran Rifa Exclusiva</title>
-  
+
   <!-- Carga de Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -30,7 +30,7 @@
 
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+
   <!-- Firebase SDK v8.10.1 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -48,6 +48,54 @@
     .grid-pattern {
       background-size: 30px 30px;
       background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    }
+    .ticket-name {
+      font-size: 7px;
+      line-height: 1;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    @keyframes pulse-banner {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    .banner-fallback {
+      animation: pulse-banner 2.4s ease-in-out infinite;
+    }
+    @keyframes flash-badge {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.6); }
+      50% { box-shadow: 0 0 0 6px rgba(251,191,36,0); }
+    }
+    .badge-flash { animation: flash-badge 1.8s ease-in-out infinite; }
+
+    /* Borde con luz girando alrededor de la tarjeta principal */
+    .glow-border-wrap {
+      position: relative;
+      padding: 4px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .glow-border-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -60%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(251,191,36,0.95) 25deg,
+        transparent 70deg,
+        transparent 290deg,
+        rgba(251,191,36,0.95) 335deg,
+        transparent 360deg
+      );
+      animation: spin-glow 4s linear infinite;
+      z-index: 0;
+    }
+    @keyframes spin-glow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -73,37 +121,61 @@
   </header>
 
   <main class="max-w-6xl w-full mx-auto p-3 sm:p-4 md:p-8 flex-grow space-y-6 md:space-y-10 pb-28 sm:pb-32">
-    <section class="relative rounded-2xl md:rounded-3xl p-5 md:p-10 border border-amber-500/30 glassmorphism overflow-hidden glow-gold">
+
+    <!-- HERO / INFO DE LA RIFA (100% dinámico desde admin) -->
+    <div class="glow-border-wrap rounded-2xl md:rounded-3xl">
+    <div class="absolute inset-[4px] rounded-2xl md:rounded-3xl bg-brand-bg"></div>
+    <section class="relative z-10 rounded-2xl md:rounded-3xl p-5 md:p-10 border border-amber-500/30 glassmorphism overflow-hidden glow-gold">
       <div class="absolute -top-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
-        <div class="space-y-3 md:space-y-4 text-center md:text-left max-w-xl">
-          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] md:text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400">
-            <i class="fa-solid fa-trophy"></i> Gran Rifa Activa
-          </span>
-          <h2 class="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight text-white leading-tight">
-            ¡Gana el Premio Mayor con <span class="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">PYA</span>!
-          </h2>
-          <p class="text-xs md:text-sm text-gray-400 leading-relaxed">
-            Selecciona tus números de la suerte en la lista interactiva. Entre más oportunidades asegures, más posibilidades tienes de ganar.
-          </p>
+
+        <div class="flex flex-col sm:flex-row items-center gap-4 md:gap-6 w-full md:w-auto">
+          <!-- Banner / GIF de la rifa, editable desde admin -->
+          <div id="banner-wrap" class="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border border-amber-500/30 shrink-0 bg-black/40 flex items-center justify-center">
+            <img id="config-banner-img" src="" alt="Banner rifa" class="w-full h-full object-cover hidden">
+            <div id="config-banner-fallback" class="banner-fallback text-4xl md:text-5xl">🎁</div>
+          </div>
+
+          <div class="space-y-2 md:space-y-3 text-center sm:text-left max-w-xl">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] md:text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 badge-flash">
+              <i class="fa-solid fa-trophy"></i> Gran Rifa Activa
+            </span>
+            <h2 id="config-titulo" class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
+              PYA Rifas
+            </h2>
+            <div class="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-1 text-[11px] md:text-xs text-gray-400">
+              <span id="config-fecha" class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-amber-400"></i></span>
+              <span id="config-ubicacion" class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-amber-400"></i></span>
+              <span id="config-precio" class="flex items-center gap-1.5 font-bold text-amber-300"></span>
+            </div>
+          </div>
         </div>
 
         <div class="bg-black/40 border border-gray-800 rounded-2xl p-4 md:p-5 w-full md:w-64 text-center space-y-2 md:space-y-3">
           <span class="text-[10px] md:text-xs text-gray-400 uppercase font-semibold">Estado de la Rifa</span>
           <div class="flex justify-around items-center pt-1">
             <div>
-              <p id="stat-disponibles" class="text-xl md:text-2xl font-black text-amber-400">100</p>
+              <p id="stat-libres" class="text-lg md:text-xl font-black text-gray-200">100</p>
               <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Libres</p>
             </div>
             <div class="w-px h-8 bg-gray-800"></div>
             <div>
-              <p id="stat-ocupados" class="text-xl md:text-2xl font-black text-red-400">0</p>
+              <p id="stat-reservados" class="text-lg md:text-xl font-black text-amber-400">0</p>
+              <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Reservados</p>
+            </div>
+            <div class="w-px h-8 bg-gray-800"></div>
+            <div>
+              <p id="stat-vendidos" class="text-lg md:text-xl font-black text-red-400">0</p>
               <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Vendidos</p>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Tabla de premios, editable desde admin -->
+      <div id="config-premios" class="relative z-10 mt-6 md:mt-8 grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3"></div>
     </section>
+    </div>
 
     <section class="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-xs text-gray-400 bg-brand-card/50 p-3 md:p-4 rounded-xl border border-gray-800/60">
       <div class="flex items-center gap-2">
@@ -115,13 +187,16 @@
         <span class="text-amber-400 font-medium">Seleccionado</span>
       </div>
       <div class="flex items-center gap-2">
+        <span class="w-3.5 h-3.5 rounded-md bg-amber-900/50 border border-amber-700"></span>
+        <span class="text-amber-300">Reservado (sin pagar)</span>
+      </div>
+      <div class="flex items-center gap-2">
         <span class="w-3.5 h-3.5 rounded-md bg-red-950 border border-red-800 opacity-60"></span>
-        <span class="text-red-400">Ocupado / Vendido</span>
+        <span class="text-red-400">Vendido / Pagado</span>
       </div>
     </section>
 
     <section>
-      <!-- Grid ajustada con minmax para asegurar que encaje perfectamente en todas las pantallas móviles -->
       <div id="grid-numeros" class="grid grid-cols-[repeat(auto-fill,minmax(55px,1fr))] sm:grid-cols-10 gap-2 md:gap-3.5"></div>
     </section>
   </main>
@@ -156,7 +231,7 @@
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
-      
+
       <form id="form-reserva" onsubmit="handleReserva(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1.5">Nombre y Apellido</label>
@@ -216,16 +291,85 @@
           <h2 class="text-xl md:text-2xl font-black text-amber-400 flex items-center gap-2">
             <i class="fa-solid fa-sliders"></i> Panel Admin PYA
           </h2>
-          <p class="text-xs text-gray-400">Gestiona números y busca ganadores</p>
+          <p class="text-xs text-gray-400">Gestiona números, pagos y la información de la rifa</p>
         </div>
         <button onclick="closeAdminDashboard()" class="bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white px-3 py-2 rounded-xl text-xs font-bold transition-all">
           Cerrar Sesión
         </button>
       </div>
 
+      <!-- CONFIGURACIÓN DE LA RIFA -->
+      <div class="bg-brand-card border border-indigo-500/30 rounded-2xl p-4 md:p-6 space-y-4">
+        <h3 class="text-base md:text-lg font-black text-indigo-300 flex items-center gap-2">
+          <i class="fa-solid fa-gift"></i> Configurar Rifa Actual
+        </h3>
+        <p class="text-[11px] text-gray-500">Estos cambios se reflejan al instante para todos los visitantes. Úsalo cada vez que arranques una nueva rifa.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Título de la rifa</label>
+            <input type="text" id="cfg-titulo" placeholder="Ej: DORADO TARDE" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Precio por boleta</label>
+            <input type="text" id="cfg-precio" placeholder="Ej: $ 1.500" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Fecha</label>
+            <input type="text" id="cfg-fecha" placeholder="Ej: 22 de agosto de 2026" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Lugar / Lotería</label>
+            <input type="text" id="cfg-ubicacion" placeholder="Ej: Lotería del Valle" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
+          </div>
+          <div class="md:col-span-2 space-y-2">
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Banner (foto o GIF)</label>
+            <div class="flex items-center gap-3">
+              <div id="cfg-banner-preview-wrap" class="w-16 h-16 rounded-xl overflow-hidden border border-gray-700 bg-black/40 flex items-center justify-center shrink-0">
+                <img id="cfg-banner-preview" src="" class="w-full h-full object-cover hidden">
+                <span id="cfg-banner-preview-empty" class="text-2xl">🎁</span>
+              </div>
+              <div class="flex-1 space-y-1.5">
+                <input type="file" id="cfg-banner-file" accept="image/*" onchange="handleBannerFile(event)" class="block w-full text-xs text-gray-300 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-600 file:text-white file:text-xs file:font-semibold hover:file:bg-indigo-700 cursor-pointer">
+                <button type="button" onclick="quitarBanner()" class="text-[11px] text-red-400 hover:text-red-300 font-semibold">Quitar imagen</button>
+              </div>
+            </div>
+            <input type="hidden" id="cfg-banner" value="">
+            <p id="cfg-banner-status" class="text-[10px] text-gray-500">Si no subes nada, se muestra un ícono animado por defecto 🎁. Los GIF pesados (más de ~350KB) no se aceptan para que la página cargue rápido.</p>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-gray-300">Premios</label>
+          <div id="cfg-premios-list" class="space-y-2"></div>
+          <button type="button" onclick="agregarFilaPremio()" class="text-xs font-semibold text-indigo-300 hover:text-indigo-200 flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> Agregar premio
+          </button>
+        </div>
+
+        <button onclick="guardarConfig()" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>Guardar Configuración</span>
+        </button>
+      </div>
+
+      <div class="bg-red-950/20 border border-red-800/40 rounded-2xl p-4 md:p-6 space-y-3">
+        <h3 class="text-base md:text-lg font-black text-red-400 flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation"></i> Iniciar Nueva Rifa
+        </h3>
+        <p class="text-[11px] text-gray-400 leading-relaxed">
+          Esto borra TODAS las boletas reservadas y vendidas: los 100 números vuelven a quedar libres para todos.
+          No borra el título ni los premios (edítalos arriba). <strong class="text-red-300">Esta acción no se puede deshacer.</strong>
+        </p>
+        <button onclick="reiniciarRifa()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span>Reiniciar Números (Nueva Rifa)</span>
+        </button>
+      </div>
+
       <div class="bg-gradient-to-r from-amber-500/10 to-amber-900/10 border border-amber-500/30 rounded-2xl p-4 md:p-6 space-y-4">
         <h3 class="text-base md:text-lg font-black text-amber-400 flex items-center gap-2">
-          <i class="fa-solid fa-trophy"></i> Consultar Número Ganador (Lotería del Valle)
+          <i class="fa-solid fa-trophy"></i> Consultar Número Ganador
         </h3>
         <div class="flex flex-col md:flex-row gap-4 items-end">
           <div class="w-full md:w-1/2">
@@ -242,11 +386,11 @@
 
       <div class="bg-brand-card border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-4 items-end">
         <div class="w-full md:w-1/2">
-          <label class="block text-xs font-semibold text-gray-300 mb-1">Marcar número como VENDIDO / OCUPADO (Manual)</label>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Marcar número como RESERVADO (Manual)</label>
           <input type="text" id="admin-block-num" placeholder="Ej: 05, 12, 99" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
         </div>
         <button onclick="adminBloquearNumero()" class="w-full md:w-auto bg-gray-800 hover:bg-gray-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all">
-          Marcar Ocupado
+          Marcar Reservado
         </button>
       </div>
 
@@ -257,6 +401,7 @@
               <th class="p-3 md:p-4">Número</th>
               <th class="p-3 md:p-4">Cliente</th>
               <th class="p-3 md:p-4">Teléfono</th>
+              <th class="p-3 md:p-4">Estado</th>
               <th class="p-3 md:p-4">Acción</th>
             </tr>
           </thead>
@@ -268,9 +413,21 @@
 
   <script>
     // CAMBIA ESTE NÚMERO POR TU NÚMERO REAL CON CÓDIGO DE PAÍS (57 para Colombia)
-    const ADMIN_WHATSAPP = '573224943553'; 
+    const ADMIN_WHATSAPP = '573224943553';
     let selectedNumbers = [];
     let occupiedNumbers = {};
+    let raffleConfig = {
+      titulo: 'PYA Rifas',
+      precio: '',
+      fecha: '',
+      ubicacion: '',
+      banner: '',
+      premios: [
+        { label: 'Dos últimas', valor: '50.000' },
+        { label: 'Dos primeras', valor: '20.000' },
+        { label: 'Dos del medio', valor: '10.000' }
+      ]
+    };
 
     const ADMIN_USER_B64 = 'UFlBYWRtaW4yNg=='; // Usuario: PYAadmin26
     const ADMIN_PASS_B64 = 'QURNSU5weWEyNg=='; // Clave: ADMINpya26
@@ -291,8 +448,39 @@
     }
     const db = firebase.database();
     const ocupadosRef = db.ref('ocupados');
+    const configRef = db.ref('config');
+    const resetSignalRef = db.ref('reset_signal');
 
-    // Escuchador en tiempo real de cambios en la base de datos
+    let resetSignalListo = false;
+    let resetSignalInicial = null;
+
+    // Escuchador de la señal de "nueva rifa": si cambia después de cargar la página,
+    // avisamos a todos los visitantes conectados que recarguen.
+    resetSignalRef.on('value', (snapshot) => {
+      const val = snapshot.val();
+      if (!resetSignalListo) {
+        resetSignalListo = true;
+        resetSignalInicial = val;
+        return;
+      }
+      if (val !== resetSignalInicial) {
+        mostrarAvisoNuevaRifa();
+      }
+    });
+
+    function mostrarAvisoNuevaRifa() {
+      if (document.getElementById('aviso-nueva-rifa')) return;
+      const aviso = document.createElement('div');
+      aviso.id = 'aviso-nueva-rifa';
+      aviso.className = 'fixed top-0 left-0 right-0 bg-amber-500 text-black text-xs sm:text-sm font-bold px-4 py-3 z-[60] flex flex-col sm:flex-row items-center justify-center gap-2 shadow-2xl';
+      aviso.innerHTML = `
+        <span><i class="fa-solid fa-triangle-exclamation"></i> ¡Hay una nueva rifa! Recarga la página para ver los números y premios actualizados.</span>
+        <button onclick="location.reload()" class="bg-black text-amber-400 font-black px-4 py-1.5 rounded-lg hover:bg-gray-900 transition-all">Recargar ahora</button>
+      `;
+      document.body.prepend(aviso);
+    }
+
+    // Escuchador en tiempo real de números ocupados/reservados
     ocupadosRef.on('value', (snapshot) => {
       ocultarAvisoSinConexion();
       occupiedNumbers = snapshot.val() || {};
@@ -302,6 +490,21 @@
       }
     }, (error) => {
       mostrarAvisoSinConexion();
+    });
+
+    // Escuchador en tiempo real de la configuración de la rifa
+    configRef.on('value', (snapshot) => {
+      const val = snapshot.val();
+      if (val) {
+        raffleConfig = Object.assign({}, raffleConfig, val);
+        if (!Array.isArray(raffleConfig.premios) || raffleConfig.premios.length === 0) {
+          raffleConfig.premios = [];
+        }
+      }
+      renderHero();
+      if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) {
+        cargarConfigEnFormulario();
+      }
     });
 
     function mostrarAvisoSinConexion() {
@@ -318,29 +521,78 @@
       if (aviso) aviso.remove();
     }
 
-    function updateStats() {
-      const occupiedCount = Object.keys(occupiedNumbers).length;
-      document.getElementById('stat-ocupados').innerText = occupiedCount;
-      document.getElementById('stat-disponibles').innerText = 100 - occupiedCount;
+    function estaPagado(data) {
+      return !!(data && typeof data === 'object' && data.pagado);
     }
 
+    function updateStats() {
+      const keys = Object.keys(occupiedNumbers);
+      const vendidos = keys.filter(k => estaPagado(occupiedNumbers[k])).length;
+      const reservados = keys.length - vendidos;
+      document.getElementById('stat-vendidos').innerText = vendidos;
+      document.getElementById('stat-reservados').innerText = reservados;
+      document.getElementById('stat-libres').innerText = 100 - keys.length;
+    }
+
+    // -------- HERO / CONFIG DE LA RIFA --------
+    function renderHero() {
+      document.getElementById('config-titulo').innerText = raffleConfig.titulo || 'PYA Rifas';
+      const fechaEl = document.getElementById('config-fecha');
+      const ubicacionEl = document.getElementById('config-ubicacion');
+      const precioEl = document.getElementById('config-precio');
+
+      fechaEl.innerHTML = raffleConfig.fecha
+        ? `<i class="fa-regular fa-calendar text-amber-400"></i> ${raffleConfig.fecha}`
+        : '';
+      ubicacionEl.innerHTML = raffleConfig.ubicacion
+        ? `<i class="fa-solid fa-location-dot text-amber-400"></i> ${raffleConfig.ubicacion}`
+        : '';
+      precioEl.innerHTML = raffleConfig.precio
+        ? `<i class="fa-solid fa-ticket text-amber-400"></i> ${raffleConfig.precio} / boleta`
+        : '';
+
+      const img = document.getElementById('config-banner-img');
+      const fallback = document.getElementById('config-banner-fallback');
+      if (raffleConfig.banner) {
+        img.src = raffleConfig.banner;
+        img.classList.remove('hidden');
+        fallback.classList.add('hidden');
+      } else {
+        img.classList.add('hidden');
+        fallback.classList.remove('hidden');
+      }
+
+      const premiosWrap = document.getElementById('config-premios');
+      const premios = raffleConfig.premios || [];
+      premiosWrap.innerHTML = premios.map((p, i) => `
+        <div class="bg-black/40 border border-amber-500/20 rounded-xl p-2.5 md:p-3 text-center">
+          <p class="text-[9px] md:text-[10px] text-gray-400 uppercase font-semibold">${i + 1}° ${p.label || ''}</p>
+          <p class="text-sm md:text-base font-black text-amber-400">$${p.valor || '0'}</p>
+        </div>
+      `).join('');
+    }
+
+    // -------- GRID DE NÚMEROS --------
     function renderGrid() {
       const grid = document.getElementById('grid-numeros');
       grid.innerHTML = '';
-      
+
       for (let i = 0; i < 100; i++) {
         const numStr = i.toString().padStart(2, '0');
-        const isOccupied = !!occupiedNumbers[numStr];
+        const data = occupiedNumbers[numStr];
+        const isOccupied = !!data;
+        const isPaid = estaPagado(data);
         const isSelected = selectedNumbers.includes(numStr);
 
         const btn = document.createElement('button');
-        btn.innerText = numStr;
         btn.disabled = isOccupied;
 
-        let baseStyle = "h-11 sm:h-12 md:h-14 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all flex items-center justify-center border shadow-sm ";
-        
-        if (isOccupied) {
-          baseStyle += "bg-red-950/30 border-red-900/50 text-red-600 cursor-not-allowed opacity-50";
+        let baseStyle = "h-11 sm:h-12 md:h-14 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all flex flex-col items-center justify-center border shadow-sm leading-none gap-0.5 ";
+
+        if (isPaid) {
+          baseStyle += "bg-red-950/30 border-red-900/50 text-red-500 cursor-not-allowed opacity-60";
+        } else if (isOccupied) {
+          baseStyle += "bg-amber-900/30 border-amber-700/50 text-amber-400 cursor-not-allowed opacity-75";
         } else if (isSelected) {
           baseStyle += "bg-gradient-to-tr from-amber-500 to-amber-400 border-amber-300 text-black shadow-lg shadow-amber-500/30 scale-105 z-10";
         } else {
@@ -348,6 +600,12 @@
         }
 
         btn.className = baseStyle;
+
+        const nombreCorto = (isOccupied && typeof data === 'object' && data.nombre)
+          ? data.nombre.split(' ')[0].slice(0, 5)
+          : '';
+
+        btn.innerHTML = `<span>${numStr}</span>${nombreCorto ? `<span class="ticket-name">${nombreCorto}</span>` : ''}`;
         btn.onclick = () => toggleNumberSelection(numStr);
         grid.appendChild(btn);
       }
@@ -367,10 +625,10 @@
     function updateCartBar() {
       const cartBar = document.getElementById('cart-bar');
       const list = document.getElementById('selected-numbers-list');
-      
+
       if (selectedNumbers.length > 0) {
         cartBar.classList.remove('translate-y-full');
-        list.innerHTML = selectedNumbers.map(n => 
+        list.innerHTML = selectedNumbers.map(n =>
           `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold px-2 py-0.5 rounded-lg text-[10px] md:text-xs">${n}</span>`
         ).join('');
       } else {
@@ -437,7 +695,8 @@
         updates[num] = {
           nombre: name,
           telefono: phone,
-          fecha: new Date().toLocaleDateString()
+          fecha: new Date().toLocaleDateString(),
+          pagado: false
         };
       });
 
@@ -477,7 +736,7 @@
 
     function handleAdminLogin(e) {
       e.preventDefault();
-      
+
       const user = document.getElementById('admin-user').value.trim();
       const pass = document.getElementById('admin-pass').value.trim();
 
@@ -498,6 +757,7 @@
       document.getElementById('modal-admin-dashboard').classList.remove('hidden');
       document.getElementById('modal-admin-dashboard').classList.add('flex');
       renderAdminTable();
+      cargarConfigEnFormulario();
     }
 
     function closeAdminDashboard() {
@@ -511,14 +771,15 @@
 
       const keys = Object.keys(occupiedNumbers);
       if (keys.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 text-xs">No hay números marcados como ocupados.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 text-xs">No hay números marcados como reservados o vendidos.</td></tr>`;
         return;
       }
 
       keys.forEach(num => {
         const data = occupiedNumbers[num];
-        const cliente = (typeof data === 'object') ? data.nombre : 'Bloqueado por Admin';
-        const telefono = (typeof data === 'object') ? data.telefono : 'N/A';
+        const cliente = (typeof data === 'object') ? (data.nombre || 'Bloqueado por Admin') : 'Bloqueado por Admin';
+        const telefono = (typeof data === 'object') ? (data.telefono || 'N/A') : 'N/A';
+        const pagado = estaPagado(data);
 
         const tr = document.createElement('tr');
         tr.className = "border-b border-gray-800/60 hover:bg-gray-900/40";
@@ -527,6 +788,14 @@
           <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${cliente}</td>
           <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${telefono}</td>
           <td class="p-3 md:p-4">
+            <span class="px-2 py-1 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-950/40 border-red-800 text-red-300' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">
+              ${pagado ? 'PAGADO' : 'RESERVADO'}
+            </span>
+          </td>
+          <td class="p-3 md:p-4 flex flex-wrap gap-2">
+            <button onclick="adminTogglePagado('${num}')" class="${pagado ? 'bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border-amber-500/30' : 'bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 border-red-500/30'} border px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
+              ${pagado ? 'Marcar Reservado' : 'Ya Pagó'}
+            </button>
             <button onclick="adminLiberarNumero('${num}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-black border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
               Liberar
             </button>
@@ -534,6 +803,12 @@
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    function adminTogglePagado(num) {
+      const data = occupiedNumbers[num];
+      const actual = estaPagado(data);
+      ocupadosRef.child(num).update({ pagado: !actual });
     }
 
     function adminBloquearNumero() {
@@ -544,7 +819,8 @@
       ocupadosRef.child(formatted).set({
         nombre: 'Bloqueado Manualmente',
         telefono: 'N/A',
-        fecha: new Date().toLocaleDateString()
+        fecha: new Date().toLocaleDateString(),
+        pagado: false
       });
       document.getElementById('admin-block-num').value = '';
     }
@@ -572,15 +848,15 @@
         return;
       }
 
-      const cliente = (typeof data === 'object') ? data.nombre : 'Sin nombre asignado';
-      const telefono = (typeof data === 'object') ? data.telefono : '';
+      const cliente = (typeof data === 'object') ? (data.nombre || 'Sin nombre asignado') : 'Sin nombre asignado';
+      const telefono = (typeof data === 'object') ? (data.telefono || '') : '';
 
       let cleanPhone = telefono.replace(/\D/g, '');
       if (cleanPhone.length === 10) {
         cleanPhone = '57' + cleanPhone;
       }
 
-      const mensajeGanador = `¡Hola ${cliente}! 🎉🥳%0A%0ATenemos excelentes noticias de *PYA RIFAS*. Tu número *${numFormatted}* ha sido el *GANADOR* del premio mayor con el resultado de la Lotería del Valle. 🏆%0A%0APor favor respóndenos a este mensaje para coordinar la entrega de tu premio.%0A%0A¡Muchas felicidades! 👏`;
+      const mensajeGanador = `¡Hola ${cliente}! 🎉🥳%0A%0ATenemos excelentes noticias de *PYA RIFAS*. Tu número *${numFormatted}* ha sido el *GANADOR* del premio mayor. 🏆%0A%0APor favor respóndenos a este mensaje para coordinar la entrega de tu premio.%0A%0A¡Muchas felicidades! 👏`;
 
       resContainer.className = "p-4 rounded-xl border bg-emerald-950/40 border-emerald-800 text-emerald-200 text-sm space-y-3";
       resContainer.innerHTML = `
@@ -602,6 +878,162 @@
       `;
     }
 
+    // -------- CONFIGURACIÓN DE LA RIFA (ADMIN) --------
+    function cargarConfigEnFormulario() {
+      document.getElementById('cfg-titulo').value = raffleConfig.titulo || '';
+      document.getElementById('cfg-precio').value = raffleConfig.precio || '';
+      document.getElementById('cfg-fecha').value = raffleConfig.fecha || '';
+      document.getElementById('cfg-ubicacion').value = raffleConfig.ubicacion || '';
+      const bannerVal = raffleConfig.banner || '';
+      document.getElementById('cfg-banner').value = bannerVal;
+      document.getElementById('cfg-banner-file').value = '';
+      document.getElementById('cfg-banner-status').innerText = 'Si no subes nada, se muestra un ícono animado por defecto 🎁. Los GIF pesados (más de ~350KB) no se aceptan para que la página cargue rápido.';
+      const previewImg = document.getElementById('cfg-banner-preview');
+      const previewEmpty = document.getElementById('cfg-banner-preview-empty');
+      if (bannerVal) {
+        previewImg.src = bannerVal;
+        previewImg.classList.remove('hidden');
+        previewEmpty.classList.add('hidden');
+      } else {
+        previewImg.classList.add('hidden');
+        previewEmpty.classList.remove('hidden');
+      }
+      renderPremiosForm();
+    }
+
+    function renderPremiosForm() {
+      const wrap = document.getElementById('cfg-premios-list');
+      const premios = raffleConfig.premios || [];
+      wrap.innerHTML = premios.map((p, i) => `
+        <div class="flex gap-2 items-center">
+          <input type="text" value="${(p.label || '').replace(/"/g, '&quot;')}" placeholder="Ej: Dos últimas" data-idx="${i}" data-field="label" oninput="onPremioInput(event)" class="flex-1 bg-black/60 border border-gray-700/80 rounded-lg p-2 text-xs text-white">
+          <input type="text" value="${(p.valor || '').replace(/"/g, '&quot;')}" placeholder="Ej: 50.000" data-idx="${i}" data-field="valor" oninput="onPremioInput(event)" class="w-28 bg-black/60 border border-gray-700/80 rounded-lg p-2 text-xs text-white">
+          <button type="button" onclick="eliminarFilaPremio(${i})" class="text-red-400 hover:text-red-300 px-2">
+            <i class="fa-solid fa-trash text-xs"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function onPremioInput(e) {
+      const idx = parseInt(e.target.dataset.idx, 10);
+      const field = e.target.dataset.field;
+      raffleConfig.premios[idx][field] = e.target.value;
+    }
+
+    function agregarFilaPremio() {
+      raffleConfig.premios = raffleConfig.premios || [];
+      raffleConfig.premios.push({ label: '', valor: '' });
+      renderPremiosForm();
+    }
+
+    function eliminarFilaPremio(i) {
+      raffleConfig.premios.splice(i, 1);
+      renderPremiosForm();
+    }
+
+    function setBannerValue(dataUrl) {
+      document.getElementById('cfg-banner').value = dataUrl;
+      const preview = document.getElementById('cfg-banner-preview');
+      const empty = document.getElementById('cfg-banner-preview-empty');
+      preview.src = dataUrl;
+      preview.classList.remove('hidden');
+      empty.classList.add('hidden');
+    }
+
+    function quitarBanner() {
+      document.getElementById('cfg-banner').value = '';
+      document.getElementById('cfg-banner-file').value = '';
+      document.getElementById('cfg-banner-preview').classList.add('hidden');
+      document.getElementById('cfg-banner-preview-empty').classList.remove('hidden');
+      document.getElementById('cfg-banner-status').innerText = 'Se quitará al guardar la configuración.';
+    }
+
+    function handleBannerFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const statusEl = document.getElementById('cfg-banner-status');
+      statusEl.innerText = 'Procesando imagen...';
+
+      // Los GIF no se pueden comprimir sin perder la animación: se validan por peso.
+      if (file.type === 'image/gif') {
+        if (file.size > 350 * 1024) {
+          statusEl.innerText = 'Ese GIF pesa mucho (máx. ~350KB). Elige uno más liviano para que cargue rápido en el celular de todos.';
+          e.target.value = '';
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          setBannerValue(ev.target.result);
+          statusEl.innerText = 'GIF listo. No olvides pulsar "Guardar Configuración".';
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+
+      // Fotos normales: se redimensionan y comprimen en el navegador antes de guardarlas.
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 400;
+          let w = img.width, h = img.height;
+          if (w > h && w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
+          else if (h >= w && h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+          setBannerValue(dataUrl);
+          statusEl.innerText = 'Imagen lista. No olvides pulsar "Guardar Configuración".';
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function reiniciarRifa() {
+      const paso1 = confirm('¿Seguro que quieres iniciar una NUEVA RIFA?\n\nEsto borrará TODOS los números reservados y vendidos actuales. Los 100 números quedarán libres de nuevo.\n\nEsta acción NO se puede deshacer.');
+      if (!paso1) return;
+
+      const paso2 = prompt('Para confirmar, escribe la palabra REINICIAR (en mayúsculas):');
+      if (paso2 !== 'REINICIAR') {
+        alert('No se realizó el reinicio porque el texto no coincidió.');
+        return;
+      }
+
+      const updates = {};
+      for (let i = 0; i < 100; i++) {
+        updates[i.toString().padStart(2, '0')] = null;
+      }
+
+      ocupadosRef.update(updates).then(() => {
+        resetSignalRef.set(Date.now());
+        alert('¡Listo! Todos los números quedaron libres. Ahora puedes actualizar el título y los premios para la nueva rifa.');
+      }).catch(() => {
+        alert('No se pudo reiniciar. Revisa tu conexión.');
+      });
+    }
+
+    function guardarConfig() {
+      const nuevaConfig = {
+        titulo: document.getElementById('cfg-titulo').value.trim(),
+        precio: document.getElementById('cfg-precio').value.trim(),
+        fecha: document.getElementById('cfg-fecha').value.trim(),
+        ubicacion: document.getElementById('cfg-ubicacion').value.trim(),
+        banner: document.getElementById('cfg-banner').value.trim(),
+        premios: (raffleConfig.premios || []).filter(p => p.label || p.valor)
+      };
+
+      configRef.set(nuevaConfig).then(() => {
+        alert('Configuración guardada. Ya se actualizó para todos los visitantes.');
+      }).catch(() => {
+        alert('No se pudo guardar la configuración. Revisa tu conexión.');
+      });
+    }
+
+    renderHero();
     renderGrid();
   </script>
 </body>
