@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PYA - Gran Rifa Exclusiva</title>
+  <title>PYA - Gran Sorteo Exclusivo</title>
 
   <!-- Carga de Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -108,7 +108,7 @@
       </div>
       <div>
         <h1 class="text-lg md:text-xl font-black tracking-wider bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">
-          PYA RIFAS
+          PYA SORTEOS
         </h1>
         <p class="text-[9px] md:text-[10px] text-gray-400 font-medium tracking-widest uppercase">Sistema Oficial de Boletas</p>
       </div>
@@ -138,7 +138,7 @@
 
           <div class="space-y-2 md:space-y-3 text-center sm:text-left max-w-xl">
             <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] md:text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 badge-flash">
-              <i class="fa-solid fa-trophy"></i> Gran Rifa Activa
+              <i class="fa-solid fa-trophy"></i> Gran Sorteo Activo
             </span>
             <h2 id="config-titulo" class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
               PYA Rifas
@@ -152,7 +152,7 @@
         </div>
 
         <div class="bg-black/40 border border-gray-800 rounded-2xl p-4 md:p-5 w-full md:w-64 text-center space-y-2 md:space-y-3">
-          <span class="text-[10px] md:text-xs text-gray-400 uppercase font-semibold">Estado de la Rifa</span>
+          <span class="text-[10px] md:text-xs text-gray-400 uppercase font-semibold">Estado del Sorteo</span>
           <div class="flex justify-around items-center pt-1">
             <div>
               <p id="stat-libres" class="text-lg md:text-xl font-black text-gray-200">100</p>
@@ -291,7 +291,7 @@
           <h2 class="text-xl md:text-2xl font-black text-amber-400 flex items-center gap-2">
             <i class="fa-solid fa-sliders"></i> Panel Admin PYA
           </h2>
-          <p class="text-xs text-gray-400">Gestiona números, pagos y la información de la rifa</p>
+          <p class="text-xs text-gray-400">Gestiona números, pagos y la información del sorteo</p>
         </div>
         <button onclick="closeAdminDashboard()" class="bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white px-3 py-2 rounded-xl text-xs font-bold transition-all">
           Cerrar Sesión
@@ -301,13 +301,13 @@
       <!-- CONFIGURACIÓN DE LA RIFA -->
       <div class="bg-brand-card border border-indigo-500/30 rounded-2xl p-4 md:p-6 space-y-4">
         <h3 class="text-base md:text-lg font-black text-indigo-300 flex items-center gap-2">
-          <i class="fa-solid fa-gift"></i> Configurar Rifa Actual
+          <i class="fa-solid fa-gift"></i> Configurar Sorteo Actual
         </h3>
-        <p class="text-[11px] text-gray-500">Estos cambios se reflejan al instante para todos los visitantes. Úsalo cada vez que arranques una nueva rifa.</p>
+        <p class="text-[11px] text-gray-500">Estos cambios se reflejan al instante para todos los visitantes. Úsalo cada vez que arranques un nuevo sorteo.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Título de la rifa</label>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Título del sorteo</label>
             <input type="text" id="cfg-titulo" placeholder="Ej: DORADO TARDE" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
           </div>
           <div>
@@ -355,7 +355,7 @@
 
       <div class="bg-red-950/20 border border-red-800/40 rounded-2xl p-4 md:p-6 space-y-3">
         <h3 class="text-base md:text-lg font-black text-red-400 flex items-center gap-2">
-          <i class="fa-solid fa-triangle-exclamation"></i> Iniciar Nueva Rifa
+          <i class="fa-solid fa-triangle-exclamation"></i> Iniciar Nuevo Sorteo
         </h3>
         <p class="text-[11px] text-gray-400 leading-relaxed">
           Esto borra TODAS las boletas reservadas y vendidas: los 100 números vuelven a quedar libres para todos.
@@ -363,7 +363,7 @@
         </p>
         <button onclick="reiniciarRifa()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
           <i class="fa-solid fa-arrows-rotate"></i>
-          <span>Reiniciar Números (Nueva Rifa)</span>
+          <span>Reiniciar Números (Nuevo Sorteo)</span>
         </button>
       </div>
 
@@ -382,6 +382,28 @@
           </button>
         </div>
         <div id="winner-result" class="hidden p-4 rounded-xl border"></div>
+      </div>
+
+      <div class="bg-brand-card border border-amber-500/20 rounded-2xl p-4 md:p-6 space-y-4">
+        <h3 class="text-base md:text-lg font-black text-amber-300 flex items-center gap-2">
+          <i class="fa-solid fa-book"></i> Historial de Ganadores (Talonario)
+        </h3>
+        <p class="text-[11px] text-gray-500">Queda guardado permanentemente, aunque después reinicies los números para un nuevo sorteo.</p>
+        <div class="overflow-x-auto rounded-xl border border-gray-800">
+          <table class="w-full text-left text-sm text-gray-300">
+            <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
+              <tr>
+                <th class="p-3 md:p-4">Sorteo</th>
+                <th class="p-3 md:p-4">Boleta</th>
+                <th class="p-3 md:p-4">Ganador</th>
+                <th class="p-3 md:p-4">Teléfono</th>
+                <th class="p-3 md:p-4">Fecha</th>
+                <th class="p-3 md:p-4">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="ganadores-table-body"></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="bg-brand-card border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-4 items-end">
@@ -417,7 +439,7 @@
     let selectedNumbers = [];
     let occupiedNumbers = {};
     let raffleConfig = {
-      titulo: 'PYA Rifas',
+      titulo: 'PYA Sorteos',
       precio: '',
       fecha: '',
       ubicacion: '',
@@ -450,6 +472,59 @@
     const ocupadosRef = db.ref('ocupados');
     const configRef = db.ref('config');
     const resetSignalRef = db.ref('reset_signal');
+    const ganadoresRef = db.ref('ganadores');
+    let ultimoGanadorEncontrado = null;
+
+    // Escuchador en tiempo real del historial de ganadores (talonario)
+    ganadoresRef.on('value', (snapshot) => {
+      renderGanadoresTable(snapshot.val() || {});
+    });
+
+    function renderGanadoresTable(data) {
+      const tbody = document.getElementById('ganadores-table-body');
+      if (!tbody) return;
+      const entries = Object.entries(data).reverse();
+
+      if (entries.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500 text-xs">Todavía no hay ganadores guardados.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = entries.map(([key, g]) => `
+        <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
+          <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${g.sorteo || '-'}</td>
+          <td class="p-3 md:p-4 font-black text-amber-400 text-sm">${g.numero || '-'}</td>
+          <td class="p-3 md:p-4 text-white text-xs md:text-sm">${g.nombre || '-'}</td>
+          <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${g.telefono || 'N/A'}</td>
+          <td class="p-3 md:p-4 text-gray-400 text-xs">${g.fecha || '-'}</td>
+          <td class="p-3 md:p-4">
+            <button onclick="eliminarGanador('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
+              Borrar
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function guardarGanadorActual() {
+      if (!ultimoGanadorEncontrado) return;
+      ganadoresRef.push({
+        sorteo: raffleConfig.titulo || 'Sin título',
+        numero: ultimoGanadorEncontrado.numero,
+        nombre: ultimoGanadorEncontrado.nombre,
+        telefono: ultimoGanadorEncontrado.telefono || '',
+        fecha: new Date().toLocaleDateString()
+      }).then(() => {
+        alert('Ganador guardado en el historial.');
+      }).catch(() => {
+        alert('No se pudo guardar en el historial. Revisa tu conexión.');
+      });
+    }
+
+    function eliminarGanador(key) {
+      if (!confirm('¿Borrar este registro del historial de ganadores?')) return;
+      ganadoresRef.child(key).remove();
+    }
 
     let resetSignalListo = false;
     let resetSignalInicial = null;
@@ -474,7 +549,7 @@
       aviso.id = 'aviso-nueva-rifa';
       aviso.className = 'fixed top-0 left-0 right-0 bg-amber-500 text-black text-xs sm:text-sm font-bold px-4 py-3 z-[60] flex flex-col sm:flex-row items-center justify-center gap-2 shadow-2xl';
       aviso.innerHTML = `
-        <span><i class="fa-solid fa-triangle-exclamation"></i> ¡Hay una nueva rifa! Recarga la página para ver los números y premios actualizados.</span>
+        <span><i class="fa-solid fa-triangle-exclamation"></i> ¡Hay un nuevo sorteo! Recarga la página para ver los números y premios actualizados.</span>
         <button onclick="location.reload()" class="bg-black text-amber-400 font-black px-4 py-1.5 rounded-lg hover:bg-gray-900 transition-all">Recargar ahora</button>
       `;
       document.body.prepend(aviso);
@@ -836,6 +911,7 @@
       const numFormatted = input.padStart(2, '0');
       const resContainer = document.getElementById('winner-result');
       resContainer.classList.remove('hidden');
+      ultimoGanadorEncontrado = null;
 
       const data = occupiedNumbers[numFormatted];
 
@@ -843,7 +919,7 @@
         resContainer.className = "p-4 rounded-xl border bg-red-950/40 border-red-800 text-red-300 text-sm space-y-1";
         resContainer.innerHTML = `
           <p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> El número ${numFormatted} NO fue vendido / comprado.</p>
-          <p class="text-xs text-red-400">El premio queda vacante o acumula según las políticas de la rifa.</p>
+          <p class="text-xs text-red-400">El premio queda vacante o acumula según las políticas del sorteo.</p>
         `;
         return;
       }
@@ -856,7 +932,9 @@
         cleanPhone = '57' + cleanPhone;
       }
 
-      const mensajeGanador = `¡Hola ${cliente}! 🎉🥳%0A%0ATenemos excelentes noticias de *PYA RIFAS*. Tu número *${numFormatted}* ha sido el *GANADOR* del premio mayor. 🏆%0A%0APor favor respóndenos a este mensaje para coordinar la entrega de tu premio.%0A%0A¡Muchas felicidades! 👏`;
+      const mensajeGanador = `¡Hola ${cliente}! 🎉🥳%0A%0ATenemos excelentes noticias de *PYA SORTEOS*. Tu número *${numFormatted}* ha sido el *GANADOR* del premio mayor. 🏆%0A%0APor favor respóndenos a este mensaje para coordinar la entrega de tu premio.%0A%0A¡Muchas felicidades! 👏`;
+
+      ultimoGanadorEncontrado = { numero: numFormatted, nombre: cliente, telefono: telefono || '' };
 
       resContainer.className = "p-4 rounded-xl border bg-emerald-950/40 border-emerald-800 text-emerald-200 text-sm space-y-3";
       resContainer.innerHTML = `
@@ -869,12 +947,18 @@
           <p><strong class="text-gray-400">Ganador(a):</strong> <span class="text-white font-bold">${cliente}</span></p>
           <p><strong class="text-gray-400">Teléfono:</strong> <span class="text-white font-bold">${telefono || 'N/A'}</span></p>
         </div>
-        ${cleanPhone ? `
-          <a href="https://wa.me/${cleanPhone}?text=${mensajeGanador}" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/20">
-            <i class="fa-brands fa-whatsapp text-base"></i>
-            <span>Notificar Ganador por WhatsApp</span>
-          </a>
-        ` : `<p class="text-xs text-amber-400 font-semibold">Este número fue bloqueado manualmente y no tiene un teléfono registrado.</p>`}
+        <div class="flex flex-wrap gap-2">
+          ${cleanPhone ? `
+            <a href="https://wa.me/${cleanPhone}?text=${mensajeGanador}" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/20">
+              <i class="fa-brands fa-whatsapp text-base"></i>
+              <span>Notificar Ganador por WhatsApp</span>
+            </a>
+          ` : `<p class="text-xs text-amber-400 font-semibold">Este número fue bloqueado manualmente y no tiene un teléfono registrado.</p>`}
+          <button onclick="guardarGanadorActual()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all">
+            <i class="fa-solid fa-bookmark"></i>
+            <span>Guardar en Historial</span>
+          </button>
+        </div>
       `;
     }
 
@@ -994,7 +1078,7 @@
     }
 
     function reiniciarRifa() {
-      const paso1 = confirm('¿Seguro que quieres iniciar una NUEVA RIFA?\n\nEsto borrará TODOS los números reservados y vendidos actuales. Los 100 números quedarán libres de nuevo.\n\nEsta acción NO se puede deshacer.');
+      const paso1 = confirm('¿Seguro que quieres iniciar un NUEVO SORTEO?\n\nEsto borrará TODOS los números reservados y vendidos actuales. Los 100 números quedarán libres de nuevo.\n\nEsta acción NO se puede deshacer.');
       if (!paso1) return;
 
       const paso2 = prompt('Para confirmar, escribe la palabra REINICIAR (en mayúsculas):');
