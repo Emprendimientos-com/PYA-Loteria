@@ -353,13 +353,43 @@
         </button>
       </div>
 
+      <!-- TALONARIO DE COMPRADORES (HISTORIAL COMPLETO) -->
+      <div class="bg-emerald-950/20 border border-emerald-800/40 rounded-2xl p-4 md:p-6 space-y-3">
+        <h3 class="text-base md:text-lg font-black text-emerald-400 flex items-center gap-2">
+          <i class="fa-solid fa-book-bookmark"></i> Talonario de Compradores (Historial Completo)
+        </h3>
+        <p class="text-[11px] text-gray-400 leading-relaxed">
+          Guarda una copia permanente de TODAS las personas que reservaron o compraron boletas en este sorteo (nombre, teléfono, número y si ya pagaron).
+          Esta copia queda guardada aunque después reinicies los números para un sorteo nuevo — de hecho, al reiniciar se hace automáticamente por seguridad.
+        </p>
+        <button onclick="guardarTalonarioActual()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>Guardar Talonario del Sorteo Actual</span>
+        </button>
+
+        <div class="overflow-x-auto rounded-xl border border-gray-800 mt-2">
+          <table class="w-full text-left text-sm text-gray-300">
+            <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
+              <tr>
+                <th class="p-3 md:p-4">Sorteo</th>
+                <th class="p-3 md:p-4">Guardado el</th>
+                <th class="p-3 md:p-4"># Boletas</th>
+                <th class="p-3 md:p-4">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="talonarios-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="bg-red-950/20 border border-red-800/40 rounded-2xl p-4 md:p-6 space-y-3">
         <h3 class="text-base md:text-lg font-black text-red-400 flex items-center gap-2">
           <i class="fa-solid fa-triangle-exclamation"></i> Iniciar Nuevo Sorteo
         </h3>
         <p class="text-[11px] text-gray-400 leading-relaxed">
           Esto borra TODAS las boletas reservadas y vendidas: los 100 números vuelven a quedar libres para todos.
-          No borra el título ni los premios (edítalos arriba). <strong class="text-red-300">Esta acción no se puede deshacer.</strong>
+          No borra el título ni los premios (edítalos arriba). Antes de borrar se guarda automáticamente el talonario completo en el historial de arriba.
+          <strong class="text-red-300">El borrado de números no se puede deshacer.</strong>
         </p>
         <button onclick="reiniciarRifa()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
           <i class="fa-solid fa-arrows-rotate"></i>
@@ -433,6 +463,45 @@
     </div>
   </div>
 
+  <!-- DETALLE DE UN TALONARIO GUARDADO -->
+  <div id="modal-talonario-detalle" class="fixed inset-0 bg-black/90 backdrop-blur-lg hidden items-center justify-center p-4 z-[60]">
+    <div class="bg-brand-card border border-gray-800 rounded-3xl p-5 md:p-8 max-w-3xl w-full shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+        <h3 id="talonario-detalle-titulo" class="text-lg md:text-xl font-black text-white">Talonario</h3>
+        <button onclick="cerrarTalonarioDetalle()" class="text-gray-500 hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-4 text-[11px] text-gray-400 bg-black/30 p-3 rounded-xl border border-gray-800/60">
+        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-brand-card border border-gray-700"></span><span>No vendida</span></div>
+        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-amber-900/50 border border-amber-700"></span><span class="text-amber-300">Reservado (sin pagar)</span></div>
+        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-red-950 border border-red-800"></span><span class="text-red-400">Vendido / Pagado</span></div>
+      </div>
+
+      <!-- Cuadrícula tipo talonario físico -->
+      <div id="talonario-detalle-grid" class="grid grid-cols-[repeat(auto-fill,minmax(52px,1fr))] gap-2"></div>
+
+      <!-- Detalle de compradores (nombre / teléfono) para copiar rápido -->
+      <div class="pt-2">
+        <p class="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">Detalle de compradores</p>
+        <div class="overflow-x-auto rounded-xl border border-gray-800">
+          <table class="w-full text-left text-sm text-gray-300">
+            <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
+              <tr>
+                <th class="p-2.5">Número</th>
+                <th class="p-2.5">Nombre</th>
+                <th class="p-2.5">Teléfono</th>
+                <th class="p-2.5">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="talonario-detalle-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // CAMBIA ESTE NÚMERO POR TU NÚMERO REAL CON CÓDIGO DE PAÍS (57 para Colombia)
     const ADMIN_WHATSAPP = '573224943553';
@@ -473,11 +542,19 @@
     const configRef = db.ref('config');
     const resetSignalRef = db.ref('reset_signal');
     const ganadoresRef = db.ref('ganadores');
+    const talonariosRef = db.ref('talonarios');
     let ultimoGanadorEncontrado = null;
+    let talonariosData = {};
 
-    // Escuchador en tiempo real del historial de ganadores (talonario)
+    // Escuchador en tiempo real del historial de ganadores (talonario de ganadores)
     ganadoresRef.on('value', (snapshot) => {
       renderGanadoresTable(snapshot.val() || {});
+    });
+
+    // Escuchador en tiempo real del historial de talonarios (compradores completos)
+    talonariosRef.on('value', (snapshot) => {
+      talonariosData = snapshot.val() || {};
+      renderTalonariosTable();
     });
 
     function renderGanadoresTable(data) {
@@ -524,6 +601,130 @@
     function eliminarGanador(key) {
       if (!confirm('¿Borrar este registro del historial de ganadores?')) return;
       ganadoresRef.child(key).remove();
+    }
+
+    // -------- TALONARIO DE COMPRADORES (HISTORIAL COMPLETO) --------
+    function renderTalonariosTable() {
+      const tbody = document.getElementById('talonarios-table-body');
+      if (!tbody) return;
+      const entries = Object.entries(talonariosData).reverse();
+
+      if (entries.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 text-xs">Todavía no hay talonarios guardados.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = entries.map(([key, t]) => {
+        const cantidad = t.numeros ? Object.keys(t.numeros).length : 0;
+        return `
+          <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
+            <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${t.sorteo || '-'}</td>
+            <td class="p-3 md:p-4 text-gray-400 text-xs">${t.fechaGuardado || '-'}</td>
+            <td class="p-3 md:p-4 text-amber-400 font-bold text-sm">${cantidad}</td>
+            <td class="p-3 md:p-4 flex flex-wrap gap-2">
+              <button onclick="verTalonario('${key}')" class="bg-indigo-500/10 hover:bg-indigo-500 text-indigo-300 hover:text-white border border-indigo-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Ver</button>
+              <button onclick="eliminarTalonario('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Borrar</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function construirSnapshotTalonario() {
+      return {
+        sorteo: raffleConfig.titulo || 'Sin título',
+        fechaSorteo: raffleConfig.fecha || '',
+        precio: raffleConfig.precio || '',
+        fechaGuardado: new Date().toLocaleString(),
+        numeros: JSON.parse(JSON.stringify(occupiedNumbers))
+      };
+    }
+
+    function guardarTalonarioActual() {
+      const keys = Object.keys(occupiedNumbers);
+      if (keys.length === 0) {
+        alert('Todavía no hay ningún número reservado o vendido para guardar.');
+        return;
+      }
+      if (!confirm(`¿Guardar el talonario actual con ${keys.length} boleta(s) registradas? Esto queda guardado permanentemente y NO borra los números actuales.`)) return;
+
+      talonariosRef.push(construirSnapshotTalonario()).then(() => {
+        alert('Talonario guardado correctamente en el historial.');
+      }).catch(() => {
+        alert('No se pudo guardar el talonario. Revisa tu conexión.');
+      });
+    }
+
+    function verTalonario(key) {
+      const t = talonariosData[key];
+      if (!t) return;
+      document.getElementById('talonario-detalle-titulo').innerText = `${t.sorteo || 'Sorteo'} — ${t.fechaGuardado || ''}`;
+      const numeros = t.numeros || {};
+
+      // -------- Cuadrícula tipo talonario físico (00 a 99) --------
+      const grid = document.getElementById('talonario-detalle-grid');
+      let gridHtml = '';
+      for (let i = 0; i < 100; i++) {
+        const numStr = i.toString().padStart(2, '0');
+        const data = numeros[numStr];
+        const isOccupied = !!data;
+        const isPaid = estaPagado(data);
+
+        let style = "h-11 sm:h-12 rounded-xl font-black text-xs transition-all flex flex-col items-center justify-center border shadow-sm leading-none gap-0.5 ";
+        if (isPaid) {
+          style += "bg-red-950/40 border-red-800 text-red-400";
+        } else if (isOccupied) {
+          style += "bg-amber-900/40 border-amber-700 text-amber-300";
+        } else {
+          style += "bg-brand-card border-gray-800 text-gray-500";
+        }
+
+        const nombreCorto = (isOccupied && typeof data === 'object' && data.nombre)
+          ? data.nombre.split(' ')[0].slice(0, 5)
+          : '';
+
+        gridHtml += `<div class="${style}"><span>${numStr}</span>${nombreCorto ? `<span class="ticket-name">${nombreCorto}</span>` : ''}</div>`;
+      }
+      grid.innerHTML = gridHtml;
+
+      // -------- Tabla de compradores (solo los números ocupados) --------
+      const body = document.getElementById('talonario-detalle-body');
+      const entries = Object.entries(numeros).sort((a, b) => a[0].localeCompare(b[0]));
+
+      if (entries.length === 0) {
+        body.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-500 text-xs">Sin registros.</td></tr>`;
+      } else {
+        body.innerHTML = entries.map(([num, data]) => {
+          const nombre = (typeof data === 'object') ? (data.nombre || 'Bloqueado por Admin') : 'Bloqueado por Admin';
+          const telefono = (typeof data === 'object') ? (data.telefono || 'N/A') : 'N/A';
+          const pagado = estaPagado(data);
+          return `
+            <tr class="border-b border-gray-800/60">
+              <td class="p-2.5 font-black text-amber-400">${num}</td>
+              <td class="p-2.5 text-white">${nombre}</td>
+              <td class="p-2.5 text-gray-400">${telefono}</td>
+              <td class="p-2.5">
+                <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-950/40 border-red-800 text-red-300' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">
+                  ${pagado ? 'PAGADO' : 'RESERVADO'}
+                </span>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('modal-talonario-detalle').classList.remove('hidden');
+      document.getElementById('modal-talonario-detalle').classList.add('flex');
+    }
+
+    function cerrarTalonarioDetalle() {
+      document.getElementById('modal-talonario-detalle').classList.add('hidden');
+      document.getElementById('modal-talonario-detalle').classList.remove('flex');
+    }
+
+    function eliminarTalonario(key) {
+      if (!confirm('¿Borrar este talonario guardado? Esta acción no se puede deshacer.')) return;
+      talonariosRef.child(key).remove();
     }
 
     let resetSignalListo = false;
@@ -1078,7 +1279,7 @@
     }
 
     function reiniciarRifa() {
-      const paso1 = confirm('¿Seguro que quieres iniciar un NUEVO SORTEO?\n\nEsto borrará TODOS los números reservados y vendidos actuales. Los 100 números quedarán libres de nuevo.\n\nEsta acción NO se puede deshacer.');
+      const paso1 = confirm('¿Seguro que quieres iniciar un NUEVO SORTEO?\n\nEsto borrará TODOS los números reservados y vendidos actuales. Los 100 números quedarán libres de nuevo.\n\nAntes de borrar, se guardará automáticamente una copia del talonario actual en el historial.\n\nEsta acción NO se puede deshacer.');
       if (!paso1) return;
 
       const paso2 = prompt('Para confirmar, escribe la palabra REINICIAR (en mayúsculas):');
@@ -1087,14 +1288,20 @@
         return;
       }
 
-      const updates = {};
-      for (let i = 0; i < 100; i++) {
-        updates[i.toString().padStart(2, '0')] = null;
-      }
+      const keys = Object.keys(occupiedNumbers);
+      const guardarPrimero = keys.length > 0
+        ? talonariosRef.push(construirSnapshotTalonario())
+        : Promise.resolve();
 
-      ocupadosRef.update(updates).then(() => {
+      guardarPrimero.then(() => {
+        const updates = {};
+        for (let i = 0; i < 100; i++) {
+          updates[i.toString().padStart(2, '0')] = null;
+        }
+        return ocupadosRef.update(updates);
+      }).then(() => {
         resetSignalRef.set(Date.now());
-        alert('¡Listo! Todos los números quedaron libres. Ahora puedes actualizar el título y los premios para la nueva rifa.');
+        alert('¡Listo! Se guardó el talonario anterior en el historial (si tenía boletas) y todos los números quedaron libres. Ahora puedes actualizar el título y los premios para la nueva rifa.');
       }).catch(() => {
         alert('No se pudo reiniciar. Revisa tu conexión.');
       });
