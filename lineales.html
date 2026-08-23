@@ -63,9 +63,101 @@
       z-index: 1;
     }
     @keyframes spin-glow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* BADGE PARA NÚMEROS DE FILA (REEMPLAZA EMOJIS KEYCAP) */
+    .fila-numero-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      padding: 0 6px;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: white;
+      font-weight: 900;
+      font-size: 12px;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      line-height: 1;
+    }
+    @media (min-width: 768px) {
+      .fila-numero-badge {
+        min-width: 30px;
+        height: 30px;
+        font-size: 14px;
+      }
+    }
+
+    /* PRELOADER */
+    #preloader-lineales {
+      position: fixed;
+      inset: 0;
+      background: #08090c;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #preloader-lineales.hidden-loader {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .loader-logo-lineales {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #8b5cf6, #a78bfa, #c4b5fd);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 40px;
+      color: #000;
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+      animation: pulse-logo-lineales 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-logo-lineales {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(139, 92, 246, 0.4); }
+      50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(139, 92, 246, 0.6); }
+    }
+    .loader-text-lineales {
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 3px;
+      color: #a78bfa;
+      text-transform: uppercase;
+    }
+    .loader-dots-lineales {
+      display: inline-block;
+      animation: dots-lineales 1.4s infinite;
+    }
+    @keyframes dots-lineales {
+      0%, 20% { content: ''; }
+      40% { content: '.'; }
+      60% { content: '..'; }
+      80%, 100% { content: '...'; }
+    }
+
+    #main-content-lineales {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    #main-content-lineales.loaded {
+      opacity: 1;
+    }
   </style>
 </head>
 <body class="bg-brand-bg text-gray-100 min-h-screen font-sans flex flex-col justify-between grid-pattern antialiased selection:bg-violet-500 selection:text-black">
+
+  <!-- PRELOADER -->
+  <div id="preloader-lineales">
+    <div class="loader-logo-lineales">L</div>
+    <div class="loader-text-lineales">PYA Lineales<span class="loader-dots-lineales">...</span></div>
+  </div>
 
   <header class="py-3 px-4 md:py-4 md:px-12 border-b border-gray-800/80 glassmorphism sticky top-0 z-40 flex justify-between items-center shadow-2xl">
     <div class="flex items-center gap-2.5 md:gap-3">
@@ -85,7 +177,7 @@
     </div>
   </header>
 
-  <main class="max-w-6xl w-full mx-auto p-3 sm:p-4 md:p-8 flex-grow space-y-6 md:space-y-10 pb-28 sm:pb-32">
+  <main id="main-content-lineales" class="max-w-6xl w-full mx-auto p-3 sm:p-4 md:p-8 flex-grow space-y-6 md:space-y-10 pb-28 sm:pb-32">
     <div class="glow-border-wrap rounded-2xl md:rounded-3xl">
       <div class="relative z-10 rounded-2xl md:rounded-3xl p-5 md:p-10 border border-violet-500/30 glassmorphism overflow-hidden glow-gold bg-brand-bg">
         <div class="absolute -top-24 -right-24 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -159,7 +251,7 @@
       <form id="form-reserva-lineales" onsubmit="handleReservaLineales(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1.5">Nombre y Apellido</label>
-          <input type="text" id="user-name-lineales" required autocomplete="off" oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\u00f1\u00d1\s]/g, '')" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-violet-500 transition-colors" placeholder="">
+          <input type="text" id="user-name-lineales" required autocomplete="off" oninput="this.value = this.value.replace(/[^A-Za-zÀ-\u00f1\u00d1\s]/g, '')" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-violet-500 transition-colors" placeholder="">
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1.5">Teléfono Celular</label>
@@ -366,11 +458,34 @@
       return [base, base + 25, base + 50, base + 75].map(n => n.toString().padStart(2, '0'));
     });
 
+    // ============ PRELOADER ============
+    let datosLinealesCargados = false;
+    let estilosLinealesListos = false;
+
+    function verificarYMostrarContenidoLineales() {
+      if (datosLinealesCargados && estilosLinealesListos) {
+        setTimeout(() => {
+          document.getElementById('preloader-lineales').classList.add('hidden-loader');
+          document.getElementById('main-content-lineales').classList.add('loaded');
+        }, 300);
+      }
+    }
+
+    window.addEventListener('load', () => {
+      estilosLinealesListos = true;
+      verificarYMostrarContenidoLineales();
+    });
+
+    setTimeout(() => {
+      estilosLinealesListos = true;
+      verificarYMostrarContenidoLineales();
+    }, 2000);
+
+    // ============ BADGE DE FILA (REEMPLAZA EMOJIS) ============
     function emojiKeycap(n) {
-  if (n === 10) return '🔟';
-  const map = { '0': '0️⃣', '1': '1️', '2': '2️⃣', '3': '3️⃣', '4': '4️⃣', '5': '5️⃣', '6': '6️⃣', '7': '7️', '8': '8️⃣', '9': '9️⃣' };
-  return n.toString().split('').map(d => map[d]).join('');
-}
+      // Devuelve HTML con estilo CSS en lugar de emojis
+      return `<span class="fila-numero-badge">${n}</span>`;
+    }
 
     function estaPagado(data) { return !!(data && typeof data === 'object' && data.pagado === true); }
     function getFilaNumeros(idx) {
@@ -429,7 +544,7 @@
         }).join('');
 
         return `<button type="button" ${isOccupied ? 'disabled' : ''} onclick="toggleFilaSelection('${filaKey}')" class="${rowStyle}">
-          <span class="shrink-0 text-sm md:text-base w-8 md:w-9 text-center">${filaLabel}</span>
+          <span class="shrink-0 w-8 md:w-9 flex items-center justify-center">${filaLabel}</span>
           <div class="flex-1 flex gap-1.5 md:gap-2">${chips}</div>
           ${nombreCorto ? `<span class="shrink-0 text-[9px] md:text-[10px] text-gray-400 max-w-[60px] truncate">${nombreCorto}</span>` : ''}
         </button>`;
@@ -565,7 +680,7 @@
         const idx = parseInt(filaKey, 10) - 1;
         const numeros = getFilaNumeros(idx).join('-');
         return `<tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
-          <td class="p-3 md:p-4 font-black text-violet-400 text-sm md:text-base">${parseInt(filaKey, 10)}</td>
+          <td class="p-3 md:p-4"><span class="fila-numero-badge">${parseInt(filaKey, 10)}</span></td>
           <td class="p-3 md:p-4 text-gray-400 text-xs">${numeros}</td>
           <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${cliente}</td>
           <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${telefono}</td>
@@ -615,7 +730,7 @@
       const telefono = (typeof data === 'object') ? (data.telefono || '') : '';
       let cleanPhone = telefono.replace(/\D/g, '');
       if (cleanPhone.length === 10) cleanPhone = '57' + cleanPhone;
-      const mensajeGanador = `¡Hola ${cliente}! 🎉%0A%0ATenemos excelentes noticias de *PYA SORTEOS - LINEALES*. Tu fila *${n} (${numeros})* ha sido la *GANADORA*. 🏆%0A%0APor favor respóndenos a este mensaje para coordinar la entrega de tu premio.`;
+      const mensajeGanador = `¡Hola ${cliente}! %0A%0ATenemos excelentes noticias de *PYA SORTEOS - LINEALES*. Tu fila *${n} (${numeros})* ha sido la *GANADORA*. 🏆%0A%0APor favor respóndenos a este mensaje para coordinar la entrega de tu premio.`;
       ultimoGanadorLineal = { fila: n, numeros, nombre: cliente, telefono: telefono || '' };
       resContainer.className = "p-3.5 rounded-xl border bg-emerald-950/40 border-emerald-800 text-emerald-200 text-sm space-y-3";
       resContainer.innerHTML = `
@@ -647,7 +762,7 @@
       tbody.innerHTML = entries.map(([key, g]) => `
         <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
           <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${g.sorteo || '-'}</td>
-          <td class="p-3 md:p-4 font-black text-violet-400 text-sm">${g.fila || '-'} ${g.numeros ? `(${g.numeros})` : ''}</td>
+          <td class="p-3 md:p-4"><span class="fila-numero-badge">${g.fila || '-'}</span> ${g.numeros ? `<span class="text-gray-400 text-xs">(${g.numeros})</span>` : ''}</td>
           <td class="p-3 md:p-4 text-white text-xs md:text-sm">${g.nombre || '-'}</td>
           <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${g.telefono || 'N/A'}</td>
           <td class="p-3 md:p-4 text-gray-400 text-xs">${g.fecha || '-'}</td>
@@ -710,7 +825,6 @@
       document.getElementById('talonario-lineales-detalle-titulo').innerText = `${t.sorteo || 'Sorteo Lineales'} — ${t.fechaGuardado || ''}`;
       const filas = t.filas || {};
       
-      // Grid de filas
       const grid = document.getElementById('talonario-lineales-detalle-grid');
       let gridHtml = '';
       
@@ -736,14 +850,13 @@
         
         gridHtml += `
           <div class="${rowStyle}">
-            <span class="shrink-0 text-sm md:text-base w-8 md:w-9 text-center font-black text-violet-400">${parseInt(filaKey, 10)}</span>
+            <span class="shrink-0 w-8 md:w-9 flex items-center justify-center"><span class="fila-numero-badge">${parseInt(filaKey, 10)}</span></span>
             <div class="flex-1 flex gap-1.5 md:gap-2">${chips}</div>
           </div>
         `;
       }
       grid.innerHTML = gridHtml;
       
-      // Tabla de detalle (solo filas ocupadas)
       const body = document.getElementById('talonario-lineales-detalle-body');
       const entries = Object.entries(filas).sort((a, b) => a[0].localeCompare(b[0]));
       
@@ -759,7 +872,7 @@
           
           return `
             <tr class="border-b border-gray-800/60">
-              <td class="p-2.5 font-black text-violet-400">${parseInt(fila, 10)}</td>
+              <td class="p-2.5"><span class="fila-numero-badge">${parseInt(fila, 10)}</span></td>
               <td class="p-2.5 text-gray-400 text-xs">${numeros}</td>
               <td class="p-2.5 text-white">${nombre}</td>
               <td class="p-2.5 text-gray-400">${telefono}</td>
@@ -903,6 +1016,8 @@
       renderLineales();
       actualizarBannerLineales();
       if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) renderAdminTableLineales();
+      datosLinealesCargados = true;
+      verificarYMostrarContenidoLineales();
     });
     linealesTalonariosRef.on('value', (snapshot) => {
       linealesTalonariosData = snapshot.val() || {};
