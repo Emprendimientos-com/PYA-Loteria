@@ -64,7 +64,7 @@
     }
     @keyframes spin-glow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    /* BADGE PARA NÚMEROS DE FILA (REEMPLAZA EMOJIS KEYCAP) */
+    /* BADGE PARA NÚMEROS DE FILA */
     .fila-numero-badge {
       display: inline-flex;
       align-items: center;
@@ -207,6 +207,8 @@
             </div>
           </div>
         </div>
+        <!-- PREMIOS - AGREGADO -->
+        <div id="lineales-premios" class="relative z-10 mt-6 md:mt-8 grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3"></div>
       </div>
     </div>
 
@@ -317,6 +319,13 @@
             <input type="hidden" id="cfg-lineales-banner" value="">
             <p id="cfg-lineales-banner-status" class="text-[10px] text-gray-500">Si no subes nada, se muestra un ícono animado por defecto. Los GIF pesados (más de ~350KB) no se aceptan para que la página cargue rápido.</p>
           </div>
+        </div>
+
+        <!-- PREMIOS - AGREGADO -->
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-gray-300">Premios</label>
+          <div id="cfg-lineales-premios-list" class="space-y-2"></div>
+          <button type="button" onclick="agregarFilaPremioLineales()" class="text-xs font-semibold text-violet-300 hover:text-violet-200 flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> Agregar premio</button>
         </div>
 
         <div class="bg-black/20 p-3 md:p-4 rounded-xl border border-gray-800/60 space-y-2">
@@ -432,7 +441,17 @@
     let linealesOcupados = {};
     let linealesTalonariosData = {};
     let ultimoGanadorLineal = null;
-    let raffleConfig = { titulo: 'PYA Sorteos', linealesPrecio: '', linealesBanner: '', linealesNumeros: null };
+    let raffleConfig = { 
+      titulo: 'PYA Sorteos', 
+      linealesPrecio: '', 
+      linealesBanner: '', 
+      linealesNumeros: null,
+      linealesPremios: [
+        { label: 'Dos últimas', valor: '50.000' },
+        { label: 'Dos primeras', valor: '20.000' },
+        { label: 'Dos del medio', valor: '10.000' }
+      ]
+    };
     const ADMIN_USER_B64 = 'UFlBYWRtaW4yNg==';
     const ADMIN_PASS_B64 = 'QURNSU5weWEyNg==';
 
@@ -481,9 +500,8 @@
       verificarYMostrarContenidoLineales();
     }, 2000);
 
-    // ============ BADGE DE FILA (REEMPLAZA EMOJIS) ============
+    // ============ BADGE DE FILA ============
     function emojiKeycap(n) {
-      // Devuelve HTML con estilo CSS en lugar de emojis
       return `<span class="fila-numero-badge">${n}</span>`;
     }
 
@@ -952,15 +970,61 @@
         fallback.classList.remove("hidden");
       }
     }
+    
+    // ============ FUNCIONES DE PREMIOS ============
+    function renderPremiosLinealesForm() {
+      const wrap = document.getElementById('cfg-lineales-premios-list');
+      const premios = raffleConfig.linealesPremios || [];
+      wrap.innerHTML = premios.map((p, i) => `
+        <div class="flex gap-2 items-center">
+          <input type="text" value="${(p.label || '').replace(/"/g, '&quot;')}" placeholder="Ej: Dos últimas" data-idx="${i}" data-field="label" oninput="onPremioLinealesInput(event)" class="flex-1 bg-black/60 border border-gray-700/80 rounded-lg p-2 text-xs text-white">
+          <input type="text" value="${(p.valor || '').replace(/"/g, '&quot;')}" placeholder="Ej: 50.000" data-idx="${i}" data-field="valor" oninput="onPremioLinealesInput(event)" class="w-28 bg-black/60 border border-gray-700/80 rounded-lg p-2 text-xs text-white">
+          <button type="button" onclick="eliminarFilaPremioLineales(${i})" class="text-red-400 hover:text-red-300 px-2"><i class="fa-solid fa-trash text-xs"></i></button>
+        </div>
+      `).join('');
+    }
+
+    function onPremioLinealesInput(e) {
+      const idx = parseInt(e.target.dataset.idx, 10);
+      const field = e.target.dataset.field;
+      if (!raffleConfig.linealesPremios[idx]) raffleConfig.linealesPremios[idx] = {};
+      raffleConfig.linealesPremios[idx][field] = e.target.value;
+    }
+
+    function agregarFilaPremioLineales() {
+      raffleConfig.linealesPremios = raffleConfig.linealesPremios || [];
+      raffleConfig.linealesPremios.push({ label: '', valor: '' });
+      renderPremiosLinealesForm();
+    }
+
+    function eliminarFilaPremioLineales(i) {
+      raffleConfig.linealesPremios.splice(i, 1);
+      renderPremiosLinealesForm();
+    }
+
+    function renderPremiosLinealesDisplay() {
+      const wrap = document.getElementById('lineales-premios');
+      const premios = raffleConfig.linealesPremios || [];
+      wrap.innerHTML = premios.map((p, i) => `
+        <div class="bg-black/40 border border-violet-500/20 rounded-xl p-2.5 md:p-3 text-center">
+          <p class="text-[9px] md:text-[10px] text-gray-400 uppercase font-semibold">${i + 1}° ${p.label || ''}</p>
+          <p class="text-sm md:text-base font-black text-violet-400">$${p.valor || '0'}</p>
+        </div>
+      `).join('');
+    }
+
     function guardarConfigLineales() {
       const nuevaConfig = Object.assign({}, raffleConfig, {
         linealesPrecio: document.getElementById('cfg-lineales-precio').value.trim(),
-        linealesBanner: document.getElementById('cfg-lineales-banner').value.trim()
+        linealesBanner: document.getElementById('cfg-lineales-banner').value.trim(),
+        linealesPremios: (raffleConfig.linealesPremios || []).filter(p => p.label || p.valor)
       });
       configRef.set(nuevaConfig).then(() => {
         alert('Configuración de Sorteo Lineales guardada correctamente.');
         raffleConfig.linealesBanner = nuevaConfig.linealesBanner;
+        raffleConfig.linealesPremios = nuevaConfig.linealesPremios;
         actualizarBannerLineales();
+        renderPremiosLinealesDisplay();
       }).catch(() => alert('Error al guardar la configuración.'));
     }
 
@@ -979,6 +1043,7 @@
         linealesPreviewImg.classList.add('hidden');
         linealesPreviewEmpty.classList.remove('hidden');
       }
+      renderPremiosLinealesForm();
       renderLinealesNumerosForm();
     }
 
@@ -1028,8 +1093,18 @@
     });
     configRef.on('value', (snapshot) => {
       const val = snapshot.val();
-      if (val) raffleConfig = Object.assign({}, raffleConfig, val);
+      if (val) {
+        raffleConfig = Object.assign({}, raffleConfig, val);
+        if (!Array.isArray(raffleConfig.linealesPremios) || raffleConfig.linealesPremios.length === 0) {
+          raffleConfig.linealesPremios = [
+            { label: 'Dos últimas', valor: '50.000' },
+            { label: 'Dos primeras', valor: '20.000' },
+            { label: 'Dos del medio', valor: '10.000' }
+          ];
+        }
+      }
       actualizarBannerLineales();
+      renderPremiosLinealesDisplay();
       const precioHero = document.getElementById('lineales-precio-hero');
       if (raffleConfig.linealesPrecio) {
         precioHero.innerHTML = `<i class="fa-solid fa-ticket text-violet-400"></i> ${raffleConfig.linealesPrecio} / fila`;
@@ -1041,6 +1116,7 @@
 
     renderLineales();
     actualizarBannerLineales();
+    renderPremiosLinealesDisplay();
   </script>
 </body>
 </html>
