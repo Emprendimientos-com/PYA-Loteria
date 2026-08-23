@@ -4,98 +4,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PYA - Gran Sorteo Exclusivo</title>
-
-  <!-- Carga de Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            brand: {
-              bg: '#08090c',
-              card: '#12141c',
-              cardHover: '#1a1d29',
-              gold: '#fbbf24',
-              goldDark: '#d97706',
-              accent: '#6366f1'
-            }
+            brand: { bg: '#08090c', card: '#12141c', cardHover: '#1a1d29', gold: '#fbbf24', goldDark: '#d97706', accent: '#6366f1' }
           }
         }
       }
     }
   </script>
-
-  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Firebase SDK v8.10.1 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
   <style>
-    .glassmorphism {
-      background: rgba(18, 20, 28, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .glow-gold {
-      box-shadow: 0 0 25px -5px rgba(251, 191, 36, 0.2);
-    }
-    .grid-pattern {
-      background-size: 30px 30px;
-      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    }
-    .ticket-name {
-      font-size: 7px;
-      line-height: 1;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    @keyframes pulse-banner {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.03); }
-    }
-    .banner-fallback {
-      animation: pulse-banner 2.4s ease-in-out infinite;
-    }
-    @keyframes flash-badge {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.6); }
-      50% { box-shadow: 0 0 0 6px rgba(251,191,36,0); }
-    }
+    .glassmorphism { background: rgba(18, 20, 28, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glow-gold { box-shadow: 0 0 25px -5px rgba(251, 191, 36, 0.2); }
+    .grid-pattern { background-size: 30px 30px; background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px); }
+    .ticket-name { font-size: 7px; line-height: 1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    @keyframes pulse-banner { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+    .banner-fallback { animation: pulse-banner 2.4s ease-in-out infinite; }
+    @keyframes flash-badge { 0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.6); } 50% { box-shadow: 0 0 0 6px rgba(251,191,36,0); } }
     .badge-flash { animation: flash-badge 1.8s ease-in-out infinite; }
-
-    /* Borde con luz girando alrededor de la tarjeta principal */
+    
+    /* EFECTO DE BORDE BRILLANTE GIRATORIO (CORREGIDO) */
     .glow-border-wrap {
       position: relative;
-      padding: 4px;
+      padding: 3px;
+      border-radius: 1rem; /* rounded-2xl */
       overflow: hidden;
-      isolation: isolate;
+      background: #08090c;
+    }
+    @media (min-width: 768px) {
+      .glow-border-wrap { border-radius: 1.5rem; } /* md:rounded-3xl */
     }
     .glow-border-wrap::before {
       content: '';
       position: absolute;
-      inset: -60%;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
       background: conic-gradient(
         from 0deg,
         transparent 0deg,
-        rgba(251,191,36,0.95) 25deg,
-        transparent 70deg,
-        transparent 290deg,
-        rgba(251,191,36,0.95) 335deg,
+        rgba(251, 191, 36, 0.9) 30deg,
+        transparent 60deg,
+        transparent 300deg,
+        rgba(251, 191, 36, 0.9) 330deg,
         transparent 360deg
       );
-      animation: spin-glow 4s linear infinite;
+      animation: spin-glow 3s linear infinite;
       z-index: 0;
     }
-    @keyframes spin-glow {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+    .glow-border-wrap > * {
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes spin-glow { 
+      from { transform: rotate(0deg); } 
+      to { transform: rotate(360deg); } 
     }
   </style>
 </head>
@@ -103,233 +74,80 @@
 
   <header class="py-3 px-4 md:py-4 md:px-12 border-b border-gray-800/80 glassmorphism sticky top-0 z-40 flex justify-between items-center shadow-2xl">
     <div class="flex items-center gap-2.5 md:gap-3">
-      <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-amber-200 flex items-center justify-center font-black text-black text-lg md:text-xl shadow-lg shadow-amber-500/20">
-        P
-      </div>
+      <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-amber-200 flex items-center justify-center font-black text-black text-lg md:text-xl shadow-lg shadow-amber-500/20">P</div>
       <div>
-        <h1 class="text-lg md:text-xl font-black tracking-wider bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">
-          PYA SORTEOS
-        </h1>
+        <h1 class="text-lg md:text-xl font-black tracking-wider bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">PYA SORTEOS</h1>
         <p class="text-[9px] md:text-[10px] text-gray-400 font-medium tracking-widest uppercase">Sistema Oficial de Boletas</p>
       </div>
     </div>
-
-    <button onclick="openAdminModal()" class="flex items-center gap-1.5 md:gap-2 text-xs font-semibold text-gray-300 hover:text-amber-400 transition-colors bg-gray-900/80 border border-gray-700/80 hover:border-amber-500/40 px-3 py-1.5 md:px-3.5 md:py-2 rounded-xl">
-      <i class="fa-solid fa-user-shield text-amber-400"></i>
-      <span>Admin</span>
-    </button>
+    <div class="flex items-center gap-2">
+      <a href="lineales.html" class="flex items-center gap-1.5 md:gap-2 text-xs font-semibold text-gray-300 hover:text-violet-400 transition-colors bg-gray-900/80 border border-gray-700/80 hover:border-violet-500/40 px-3 py-1.5 md:px-3.5 md:py-2 rounded-xl">
+        <i class="fa-solid fa-grip-lines text-violet-400"></i><span>Sorteo Lineales</span>
+      </a>
+      <button onclick="openAdminModal()" class="flex items-center gap-1.5 md:gap-2 text-xs font-semibold text-gray-300 hover:text-amber-400 transition-colors bg-gray-900/80 border border-gray-700/80 hover:border-amber-500/40 px-3 py-1.5 md:px-3.5 md:py-2 rounded-xl">
+        <i class="fa-solid fa-user-shield text-amber-400"></i><span>Admin</span>
+      </button>
+    </div>
   </header>
 
   <main class="max-w-6xl w-full mx-auto p-3 sm:p-4 md:p-8 flex-grow space-y-6 md:space-y-10 pb-28 sm:pb-32">
-
-    <!-- HERO / INFO DE LA RIFA (100% dinámico desde admin) -->
+    
+    <!-- HERO CON BORDE BRILLANTE AMARILLO (ESTRUCTURA CORREGIDA) -->
     <div class="glow-border-wrap rounded-2xl md:rounded-3xl">
-    <div class="absolute inset-[4px] rounded-2xl md:rounded-3xl bg-brand-bg"></div>
-    <section class="relative z-10 rounded-2xl md:rounded-3xl p-5 md:p-10 border border-amber-500/30 glassmorphism overflow-hidden glow-gold">
-      <div class="absolute -top-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
-
-        <div class="flex flex-col sm:flex-row items-center gap-4 md:gap-6 w-full md:w-auto">
-          <!-- Banner / GIF de la rifa, editable desde admin -->
-          <div id="banner-wrap" class="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border border-amber-500/30 shrink-0 bg-black/40 flex items-center justify-center">
-            <img id="config-banner-img" src="" alt="Banner rifa" class="w-full h-full object-cover hidden">
-            <div id="config-banner-fallback" class="banner-fallback text-4xl md:text-5xl">🎁</div>
-          </div>
-
-          <div class="space-y-2 md:space-y-3 text-center sm:text-left max-w-xl">
-            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] md:text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 badge-flash">
-              <i class="fa-solid fa-trophy"></i> Gran Sorteo Activo
-            </span>
-            <h2 id="config-titulo" class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
-              PYA Rifas
-            </h2>
-            <div class="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-1 text-[11px] md:text-xs text-gray-400">
-              <span id="config-fecha" class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-amber-400"></i></span>
-              <span id="config-ubicacion" class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-amber-400"></i></span>
-              <span id="config-precio" class="flex items-center gap-1.5 font-bold text-amber-300"></span>
+      <div class="relative z-10 rounded-2xl md:rounded-3xl p-5 md:p-10 border border-amber-500/30 glassmorphism overflow-hidden glow-gold bg-brand-bg">
+        <div class="absolute -top-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
+          <div class="flex flex-col sm:flex-row items-center gap-4 md:gap-6 w-full md:w-auto">
+            <div id="banner-wrap" class="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border border-amber-500/30 shrink-0 bg-black/40 flex items-center justify-center">
+              <img id="config-banner-img" src="" alt="Banner rifa" class="w-full h-full object-cover hidden">
+              <div id="config-banner-fallback" class="banner-fallback text-4xl md:text-5xl">🎁</div>
+            </div>
+            <div class="space-y-2 md:space-y-3 text-center sm:text-left max-w-xl">
+              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] md:text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 badge-flash"><i class="fa-solid fa-trophy"></i> Gran Sorteo Activo</span>
+              <h2 id="config-titulo" class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">PYA Rifas</h2>
+              <div class="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-1 text-[11px] md:text-xs text-gray-400">
+                <span id="config-fecha" class="flex items-center gap-1.5"></span>
+                <span id="config-ubicacion" class="flex items-center gap-1.5"></span>
+                <span id="config-precio" class="flex items-center gap-1.5 font-bold text-amber-300"></span>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="bg-black/40 border border-gray-800 rounded-2xl p-4 md:p-5 w-full md:w-64 text-center space-y-2 md:space-y-3">
-          <span class="text-[10px] md:text-xs text-gray-400 uppercase font-semibold">Estado del Sorteo</span>
-          <div class="flex justify-around items-center pt-1">
-            <div>
-              <p id="stat-libres" class="text-lg md:text-xl font-black text-gray-200">100</p>
-              <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Libres</p>
-            </div>
-            <div class="w-px h-8 bg-gray-800"></div>
-            <div>
-              <p id="stat-reservados" class="text-lg md:text-xl font-black text-amber-400">0</p>
-              <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Reservados</p>
-            </div>
-            <div class="w-px h-8 bg-gray-800"></div>
-            <div>
-              <p id="stat-vendidos" class="text-lg md:text-xl font-black text-red-400">0</p>
-              <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Vendidos</p>
+          <div class="bg-black/40 border border-gray-800 rounded-2xl p-4 md:p-5 w-full md:w-64 text-center space-y-2 md:space-y-3">
+            <span class="text-[10px] md:text-xs text-gray-400 uppercase font-semibold">Estado del Sorteo</span>
+            <div class="flex justify-around items-center pt-1">
+              <div><p id="stat-libres" class="text-lg md:text-xl font-black text-gray-200">100</p><p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Libres</p></div>
+              <div class="w-px h-8 bg-gray-800"></div>
+              <div><p id="stat-reservados" class="text-lg md:text-xl font-black text-amber-400">0</p><p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Reservados</p></div>
+              <div class="w-px h-8 bg-gray-800"></div>
+              <div><p id="stat-vendidos" class="text-lg md:text-xl font-black text-red-400">0</p><p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Vendidos</p></div>
             </div>
           </div>
         </div>
+        <div id="config-premios" class="relative z-10 mt-6 md:mt-8 grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3"></div>
       </div>
-
-      <!-- Tabla de premios, editable desde admin -->
-      <div id="config-premios" class="relative z-10 mt-6 md:mt-8 grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-3"></div>
-    </section>
     </div>
 
-    <!-- MEDIOS DE PAGO -->
     <section class="bg-brand-card/50 border border-amber-500/20 rounded-xl p-3.5 md:p-4 text-center space-y-1">
       <p class="text-amber-400 font-black text-xs md:text-sm tracking-wide">MEDIOS DE PAGO 💰</p>
-      <p class="text-xs md:text-sm text-gray-200 font-semibold">
-        NEQUI: <span class="text-white font-black">3235532989</span>
-        <span class="text-gray-600 mx-1">|</span>
-        DAVIPLATA: <span class="text-white font-black">3235532989</span>
-      </p>
+      <p class="text-xs md:text-sm text-gray-200 font-semibold">NEQUI: <span class="text-white font-black">3235532989</span> <span class="text-gray-600 mx-1">|</span> DAVIPLATA: <span class="text-white font-black">3235532989</span></p>
       <p class="text-[10px] md:text-[11px] text-gray-500">Comprobantes al interno, gracias.</p>
     </section>
 
     <section class="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-xs text-gray-400 bg-brand-card/50 p-3 md:p-4 rounded-xl border border-gray-800/60">
-      <div class="flex items-center gap-2">
-        <span class="w-3.5 h-3.5 rounded-md bg-brand-card border border-gray-700"></span>
-        <span>Disponible</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="w-3.5 h-3.5 rounded-md bg-amber-500 shadow-sm shadow-amber-500"></span>
-        <span class="text-amber-400 font-medium">Seleccionado</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="w-3.5 h-3.5 rounded-md bg-amber-900/50 border border-amber-700"></span>
-        <span class="text-amber-300">Reservado (sin pagar)</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="w-3.5 h-3.5 rounded-md bg-red-950 border border-red-800 opacity-60"></span>
-        <span class="text-red-400">Vendido / Pagado</span>
-      </div>
+      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-brand-card border border-gray-700"></span><span>Disponible</span></div>
+      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-amber-500 shadow-sm shadow-amber-500"></span><span class="text-amber-400 font-medium">Seleccionado</span></div>
+      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-amber-900/50 border border-amber-700"></span><span class="text-amber-300">Reservado (sin pagar)</span></div>
+      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-red-950 border border-red-800 opacity-60"></span><span class="text-red-400">Vendido / Pagado</span></div>
     </section>
 
-    <section>
-      <div id="grid-numeros" class="grid grid-cols-[repeat(auto-fill,minmax(55px,1fr))] sm:grid-cols-10 gap-2 md:gap-3.5"></div>
-    </section>
-
-    <!-- SORTEO LINEALES (25 filas x 4 números) - RIFA INDEPENDIENTE, activable/desactivable desde admin -->
-    <section id="sorteo-lineales-section" class="hidden space-y-6 md:space-y-10">
-
-      <!-- HERO del Sorteo Lineales, mismo estilo que el hero del sorteo principal -->
-      <div class="glow-border-wrap rounded-2xl md:rounded-3xl">
-        <div class="absolute inset-[4px] rounded-2xl md:rounded-3xl bg-brand-bg"></div>
-        <div class="relative z-10 rounded-2xl md:rounded-3xl p-5 md:p-10 border border-amber-500/30 glassmorphism overflow-hidden glow-gold">
-          <div class="absolute -top-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
-
-            <div class="flex flex-col sm:flex-row items-center gap-4 md:gap-6 w-full md:w-auto">
-              <div class="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border border-amber-500/30 shrink-0 bg-black/40 flex items-center justify-center">
-                <img id="lineales-banner-img" src="" class="w-full h-full object-cover hidden">
-                <div id="lineales-banner-fallback" class="text-amber-400 text-4xl md:text-5xl">
-                  <i class="fa-solid fa-grip-lines"></i>
-                </div>
-              </div>
-
-              <div class="space-y-2 md:space-y-3 text-center sm:text-left max-w-xl">
-                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] md:text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 badge-flash">
-                  <i class="fa-solid fa-trophy"></i> Sorteo Lineales Activo
-                </span>
-                <h2 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
-                  Sorteo Lineales
-                </h2>
-                <div class="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-1 text-[11px] md:text-xs text-gray-400">
-                  <span class="flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-amber-400"></i> 25 filas de 4 números</span>
-                  <span id="lineales-precio-hero" class="hidden items-center gap-1.5 font-bold text-amber-300"><i class="fa-solid fa-ticket text-amber-400"></i></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-black/40 border border-gray-800 rounded-2xl p-4 md:p-5 w-full md:w-64 text-center space-y-2 md:space-y-3">
-              <span class="text-[10px] md:text-xs text-gray-400 uppercase font-semibold">Estado del Sorteo</span>
-              <div class="flex justify-around items-center pt-1">
-                <div>
-                  <p id="lineales-stat-libres" class="text-lg md:text-xl font-black text-gray-200">25</p>
-                  <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Libres</p>
-                </div>
-                <div class="w-px h-8 bg-gray-800"></div>
-                <div>
-                  <p id="lineales-stat-reservados" class="text-lg md:text-xl font-black text-amber-400">0</p>
-                  <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Reservados</p>
-                </div>
-                <div class="w-px h-8 bg-gray-800"></div>
-                <div>
-                  <p id="lineales-stat-vendidos" class="text-lg md:text-xl font-black text-red-400">0</p>
-                  <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Vendidos</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- MEDIOS DE PAGO (Sorteo Lineales) -->
-      <div class="bg-brand-card/50 border border-amber-500/20 rounded-xl p-3.5 md:p-4 text-center space-y-1">
-        <p class="text-amber-400 font-black text-xs md:text-sm tracking-wide">MEDIOS DE PAGO 💰</p>
-        <p class="text-xs md:text-sm text-gray-200 font-semibold">
-          NEQUI: <span class="text-white font-black">3235532989</span>
-          <span class="text-gray-600 mx-1">|</span>
-          DAVIPLATA: <span class="text-white font-black">3235532989</span>
-        </p>
-        <p class="text-[10px] md:text-[11px] text-gray-500">Comprobantes al interno, gracias.</p>
-      </div>
-
-      <div class="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-xs text-gray-400 bg-brand-card/50 p-3 md:p-4 rounded-xl border border-gray-800/60">
-        <div class="flex items-center gap-2">
-          <span class="w-3.5 h-3.5 rounded-md bg-brand-card border border-gray-700"></span>
-          <span>Disponible</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-3.5 h-3.5 rounded-md bg-amber-500 shadow-sm shadow-amber-500"></span>
-          <span class="text-amber-400 font-medium">Seleccionado</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-3.5 h-3.5 rounded-md bg-amber-900/50 border border-amber-700"></span>
-          <span class="text-amber-300">Reservado (sin pagar)</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-3.5 h-3.5 rounded-md bg-red-950 border border-red-800 opacity-60"></span>
-          <span class="text-red-400">Vendido / Pagado</span>
-        </div>
-      </div>
-
-      <!-- Tarjeta con la grilla de filas -->
-      <div class="glow-border-wrap rounded-2xl md:rounded-3xl">
-        <div class="absolute inset-[4px] rounded-2xl md:rounded-3xl bg-brand-bg"></div>
-        <div class="relative z-10 rounded-2xl md:rounded-3xl p-4 md:p-6 border border-amber-500/30 glassmorphism">
-          <div id="lineales-grid" class="space-y-1.5 md:space-y-2"></div>
-
-          <!-- Resumen de selección / reserva propia del Sorteo Lineales -->
-          <div id="lineales-cart" class="hidden mt-4 md:mt-5 bg-black/40 border border-amber-500/30 rounded-xl p-3.5 md:p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-2.5 w-full sm:w-auto">
-              <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm md:text-base shrink-0">
-                <i class="fa-solid fa-ticket"></i>
-              </div>
-              <div>
-                <p class="text-[10px] md:text-xs text-gray-400">Filas seleccionadas:</p>
-                <div id="lineales-selected-list" class="flex flex-wrap gap-1 mt-0.5"></div>
-              </div>
-            </div>
-            <button onclick="openCheckoutModalLineales()" class="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-black font-extrabold px-6 py-3 rounded-xl shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 text-sm">
-              <i class="fa-brands fa-whatsapp text-lg"></i>
-              <span>Apartar Filas por WhatsApp</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <section><div id="grid-numeros" class="grid grid-cols-[repeat(auto-fill,minmax(55px,1fr))] sm:grid-cols-10 gap-2 md:gap-3.5"></div></section>
   </main>
 
   <div id="cart-bar" class="fixed bottom-0 left-0 right-0 glassmorphism p-3.5 md:p-5 border-t border-amber-500/20 transform translate-y-full transition-all duration-300 z-30 shadow-2xl">
     <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
       <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm md:text-base">
-            <i class="fa-solid fa-ticket"></i>
-          </div>
+          <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm md:text-base shrink-0"><i class="fa-solid fa-ticket"></i></div>
           <div>
             <p class="text-[10px] md:text-xs text-gray-400">Tus números seleccionados:</p>
             <div id="selected-numbers-list" class="flex flex-wrap gap-1 mt-0.5"></div>
@@ -337,8 +155,7 @@
         </div>
       </div>
       <button onclick="openCheckoutModal()" class="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-black font-extrabold px-6 py-3 rounded-xl shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 text-sm">
-        <i class="fa-brands fa-whatsapp text-lg"></i>
-        <span>Apartar por WhatsApp</span>
+        <i class="fa-brands fa-whatsapp text-lg"></i><span>Apartar por WhatsApp</span>
       </button>
     </div>
   </div>
@@ -346,14 +163,9 @@
   <div id="modal-checkout" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 z-50">
     <div class="bg-brand-card border border-gray-800 rounded-3xl p-5 md:p-8 max-w-md w-full shadow-2xl relative space-y-5">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3 md:pb-4">
-        <h3 class="text-lg md:text-xl font-black text-white flex items-center gap-2">
-          <i class="fa-solid fa-clipboard-check text-amber-400"></i> Confirmar Reserva
-        </h3>
-        <button onclick="closeCheckoutModal()" class="text-gray-500 hover:text-white transition-colors">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <h3 class="text-lg md:text-xl font-black text-white flex items-center gap-2"><i class="fa-solid fa-clipboard-check text-amber-400"></i> Confirmar Reserva</h3>
+        <button onclick="closeCheckoutModal()" class="text-gray-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-
       <form id="form-reserva" onsubmit="handleReserva(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1.5">Nombre y Apellido</label>
@@ -367,49 +179,9 @@
           <label class="block text-xs font-semibold text-gray-300 mb-1.5">Boleta(s) Reservada(s)</label>
           <input type="text" id="user-numbers" readonly class="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-sm text-amber-400 font-bold" value="">
         </div>
-
         <div class="flex gap-3 pt-2 md:pt-4">
           <button type="button" onclick="closeCheckoutModal()" class="w-1/2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold py-3 rounded-xl text-sm transition-all">Cancelar</button>
-          <button type="submit" class="w-1/2 bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2">
-            <span>Continuar</span>
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="modal-checkout-lineales" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 z-50">
-    <div class="bg-brand-card border border-gray-800 rounded-3xl p-5 md:p-8 max-w-md w-full shadow-2xl relative space-y-5">
-      <div class="flex justify-between items-center border-b border-gray-800 pb-3 md:pb-4">
-        <h3 class="text-lg md:text-xl font-black text-white flex items-center gap-2">
-          <i class="fa-solid fa-clipboard-check text-amber-400"></i> Confirmar Reserva — Sorteo Lineales
-        </h3>
-        <button onclick="closeCheckoutModalLineales()" class="text-gray-500 hover:text-white transition-colors">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <form id="form-reserva-lineales" onsubmit="handleReservaLineales(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Nombre y Apellido</label>
-          <input type="text" id="user-name-lineales" required autocomplete="off" oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\u00f1\u00d1\s]/g, '')" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Teléfono Celular</label>
-          <input type="tel" id="user-phone-lineales" required autocomplete="off" inputmode="numeric" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Fila(s) Reservada(s)</label>
-          <input type="text" id="user-filas" readonly class="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-sm text-amber-400 font-bold" value="">
-        </div>
-
-        <div class="flex gap-3 pt-2 md:pt-4">
-          <button type="button" onclick="closeCheckoutModalLineales()" class="w-1/2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold py-3 rounded-xl text-sm transition-all">Cancelar</button>
-          <button type="submit" class="w-1/2 bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2">
-            <span>Continuar</span>
-            <i class="fa-solid fa-arrow-right"></i>
-          </button>
+          <button type="submit" class="w-1/2 bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"><span>Continuar</span><i class="fa-solid fa-arrow-right"></i></button>
         </div>
       </form>
     </div>
@@ -418,13 +190,10 @@
   <div id="modal-admin-login" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 z-50">
     <div class="bg-brand-card border border-gray-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-6">
       <div class="text-center space-y-2">
-        <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mx-auto text-xl">
-          <i class="fa-solid fa-lock"></i>
-        </div>
+        <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mx-auto text-xl"><i class="fa-solid fa-lock"></i></div>
         <h3 class="text-xl font-bold text-white">Acceso Administrador</h3>
         <p class="text-xs text-gray-400">Ingresa las credenciales de gestión de PYA</p>
       </div>
-
       <form onsubmit="handleAdminLogin(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1">Usuario</label>
@@ -446,40 +215,19 @@
     <div class="max-w-5xl mx-auto w-full space-y-6">
       <div class="flex justify-between items-center bg-brand-card border border-gray-800 rounded-2xl p-4 md:p-6">
         <div>
-          <h2 class="text-xl md:text-2xl font-black text-amber-400 flex items-center gap-2">
-            <i class="fa-solid fa-sliders"></i> Panel Admin PYA
-          </h2>
+          <h2 class="text-xl md:text-2xl font-black text-amber-400 flex items-center gap-2"><i class="fa-solid fa-sliders"></i> Panel Admin PYA</h2>
           <p class="text-xs text-gray-400">Gestiona números, pagos y la información del sorteo</p>
         </div>
-        <button onclick="closeAdminDashboard()" class="bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white px-3 py-2 rounded-xl text-xs font-bold transition-all">
-          Cerrar Sesión
-        </button>
+        <button onclick="closeAdminDashboard()" class="bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white px-3 py-2 rounded-xl text-xs font-bold transition-all">Cerrar Sesión</button>
       </div>
 
-      <!-- CONFIGURACIÓN DE LA RIFA -->
       <div class="bg-brand-card border border-indigo-500/30 rounded-2xl p-4 md:p-6 space-y-4">
-        <h3 class="text-base md:text-lg font-black text-indigo-300 flex items-center gap-2">
-          <i class="fa-solid fa-gift"></i> Configurar Sorteo Actual
-        </h3>
-        <p class="text-[11px] text-gray-500">Estos cambios se reflejan al instante para todos los visitantes. Úsalo cada vez que arranques un nuevo sorteo.</p>
-
+        <h3 class="text-base md:text-lg font-black text-indigo-300 flex items-center gap-2"><i class="fa-solid fa-gift"></i> Configurar Sorteo Actual</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Título del sorteo</label>
-            <input type="text" id="cfg-titulo" placeholder="Ej: DORADO TARDE" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Precio por boleta</label>
-            <input type="text" id="cfg-precio" placeholder="Ej: $ 1.500" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Fecha</label>
-            <input type="text" id="cfg-fecha" placeholder="Ej: 22 de agosto de 2026" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Lugar / Lotería</label>
-            <input type="text" id="cfg-ubicacion" placeholder="Ej: Lotería del Valle" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
-          </div>
+          <div><label class="block text-xs font-semibold text-gray-300 mb-1">Título del sorteo</label><input type="text" id="cfg-titulo" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
+          <div><label class="block text-xs font-semibold text-gray-300 mb-1">Precio por boleta</label><input type="text" id="cfg-precio" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
+          <div><label class="block text-xs font-semibold text-gray-300 mb-1">Fecha</label><input type="text" id="cfg-fecha" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
+          <div><label class="block text-xs font-semibold text-gray-300 mb-1">Lugar / Lotería</label><input type="text" id="cfg-ubicacion" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
           <div class="md:col-span-2 space-y-2">
             <label class="block text-xs font-semibold text-gray-300 mb-1">Banner (foto o GIF)</label>
             <div class="flex items-center gap-3">
@@ -493,207 +241,23 @@
               </div>
             </div>
             <input type="hidden" id="cfg-banner" value="">
-            <p id="cfg-banner-status" class="text-[10px] text-gray-500">Si no subes nada, se muestra un ícono animado por defecto 🎁. Los GIF pesados (más de ~350KB) no se aceptan para que la página cargue rápido.</p>
           </div>
         </div>
-
         <div class="space-y-2">
           <label class="block text-xs font-semibold text-gray-300">Premios</label>
           <div id="cfg-premios-list" class="space-y-2"></div>
-          <button type="button" onclick="agregarFilaPremio()" class="text-xs font-semibold text-indigo-300 hover:text-indigo-200 flex items-center gap-1.5">
-            <i class="fa-solid fa-plus"></i> Agregar premio
-          </button>
+          <button type="button" onclick="agregarFilaPremio()" class="text-xs font-semibold text-indigo-300 hover:text-indigo-200 flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> Agregar premio</button>
         </div>
-
-        <button onclick="guardarConfig()" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
-          <i class="fa-solid fa-floppy-disk"></i>
-          <span>Guardar Configuración</span>
-        </button>
+        <button onclick="guardarConfig()" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-floppy-disk"></i><span>Guardar Configuración</span></button>
       </div>
 
-      <!-- ============================================================ -->
-      <!-- SORTEO LINEALES — PANEL 100% INDEPENDIENTE DEL SORTEO PRINCIPAL -->
-      <!-- ============================================================ -->
-      <div class="bg-violet-950/20 border border-violet-700/40 rounded-2xl p-4 md:p-6 space-y-4">
-        <h3 class="text-base md:text-lg font-black text-violet-300 flex items-center gap-2">
-          <i class="fa-solid fa-grip-lines"></i> Sorteo Lineales (Rifa Independiente)
-        </h3>
-        <p class="text-[11px] text-gray-500 leading-relaxed">
-          Esta es una rifa aparte: sus filas, compradores, precio y estado NO se mezclan con el sorteo principal de arriba.
-          Se vende por fila completa (25 filas, cada una con 4 números).
-        </p>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-black/20 p-3 md:p-4 rounded-xl border border-gray-800/60">
-          <label class="flex items-center gap-2.5 cursor-pointer md:col-span-2">
-            <input type="checkbox" id="cfg-lineales-activo" class="w-4 h-4 accent-violet-500">
-            <span class="text-xs md:text-sm font-semibold text-gray-200">Activar "Sorteo Lineales" en la página pública</span>
-          </label>
-          <div>
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Precio por fila</label>
-            <input type="text" id="cfg-lineales-precio" placeholder="Ej: $ 5.000" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
-          </div>
-          <div class="flex items-end">
-            <button onclick="guardarConfigLineales()" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
-              <i class="fa-solid fa-floppy-disk"></i>
-              <span>Guardar Config. Lineales</span>
-            </button>
-          </div>
-          <div class="md:col-span-2 space-y-2">
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Banner Lineales (foto o GIF)</label>
-            <div class="flex items-center gap-3">
-              <div id="cfg-lineales-banner-preview-wrap" class="w-16 h-16 rounded-xl overflow-hidden border border-gray-700 bg-black/40 flex items-center justify-center shrink-0">
-                <img id="cfg-lineales-banner-preview" src="" class="w-full h-full object-cover hidden">
-                <span id="cfg-lineales-banner-preview-empty" class="text-amber-400 text-xl"><i class="fa-solid fa-grip-lines"></i></span>
-              </div>
-              <div class="flex-1 space-y-1.5">
-                <input type="file" id="cfg-lineales-banner-file" accept="image/*" onchange="handleLinealesBannerFile(event)" class="block w-full text-xs text-gray-300 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-violet-600 file:text-white file:text-xs file:font-semibold hover:file:bg-violet-700 cursor-pointer">
-                <button type="button" onclick="quitarBannerLineales()" class="text-[11px] text-red-400 hover:text-red-300 font-semibold">Quitar imagen</button>
-              </div>
-            </div>
-            <input type="hidden" id="cfg-lineales-banner" value="">
-            <p id="cfg-lineales-banner-status" class="text-[10px] text-gray-500">Si no subes nada, se muestra un ícono animado por defecto. Los GIF pesados (más de ~350KB) no se aceptan para que la página cargue rápido.</p>
-          </div>
-        </div>
-
-        <!-- Editor de números de cada fila -->
-        <div class="bg-black/20 p-3 md:p-4 rounded-xl border border-gray-800/60 space-y-2">
-          <div class="flex items-center justify-between flex-wrap gap-2">
-            <label class="block text-xs font-semibold text-gray-300">Números de cada fila (editable)</label>
-            <div class="flex gap-2">
-              <button type="button" onclick="restaurarLinealesNumerosPorDefecto()" class="text-[11px] font-semibold text-gray-400 hover:text-gray-200">Restaurar por defecto</button>
-              <button type="button" onclick="guardarLinealesNumeros()" class="bg-violet-600 hover:bg-violet-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition-all">Guardar Números</button>
-            </div>
-          </div>
-          <p class="text-[10px] text-gray-500">Cada fila tiene 4 números de 2 dígitos. Cámbialos para que coincidan con tu talonario físico.</p>
-          <div id="cfg-lineales-numeros" class="grid grid-cols-1 gap-1.5 max-h-80 overflow-y-auto pr-1"></div>
-        </div>
-
-        <!-- Talonario de compradores del Sorteo Lineales -->
-        <div class="bg-emerald-950/20 border border-emerald-800/40 rounded-2xl p-3.5 md:p-4 space-y-3">
-          <h4 class="text-sm font-black text-emerald-400 flex items-center gap-2">
-            <i class="fa-solid fa-book-bookmark"></i> Talonario de Compradores — Lineales
-          </h4>
-          <button onclick="guardarTalonarioLinealesActual()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-floppy-disk"></i>
-            <span>Guardar Talonario Lineales Actual</span>
-          </button>
-          <div class="overflow-x-auto rounded-xl border border-gray-800">
-            <table class="w-full text-left text-sm text-gray-300">
-              <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
-                <tr>
-                  <th class="p-2.5 md:p-3">Sorteo</th>
-                  <th class="p-2.5 md:p-3">Guardado el</th>
-                  <th class="p-2.5 md:p-3"># Filas</th>
-                  <th class="p-2.5 md:p-3">Acción</th>
-                </tr>
-              </thead>
-              <tbody id="talonarios-lineales-table-body"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Reiniciar Sorteo Lineales -->
-        <div class="bg-red-950/20 border border-red-800/40 rounded-2xl p-3.5 md:p-4 space-y-2.5">
-          <h4 class="text-sm font-black text-red-400 flex items-center gap-2">
-            <i class="fa-solid fa-triangle-exclamation"></i> Iniciar Nuevo Sorteo Lineales
-          </h4>
-          <p class="text-[11px] text-gray-400">Borra todas las filas reservadas/vendidas de Lineales (no afecta el sorteo principal). Se guarda automáticamente el talonario antes de borrar.</p>
-          <button onclick="reiniciarLineales()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-arrows-rotate"></i>
-            <span>Reiniciar Filas (Nuevo Sorteo Lineales)</span>
-          </button>
-        </div>
-
-        <!-- Ganador Lineales -->
-        <div class="bg-amber-500/5 border border-amber-500/30 rounded-2xl p-3.5 md:p-4 space-y-3">
-          <h4 class="text-sm font-black text-amber-400 flex items-center gap-2">
-            <i class="fa-solid fa-trophy"></i> Consultar Fila Ganadora
-          </h4>
-          <div class="flex flex-col md:flex-row gap-3 items-end">
-            <div class="w-full md:w-1/2">
-              <label class="block text-xs font-semibold text-gray-300 mb-1">Número de fila ganadora (1 a 25)</label>
-              <input type="text" id="admin-winner-fila" placeholder="Ej: 1, 13, 25" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
-            </div>
-            <button onclick="buscarGanadorLineal()" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-black font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              <span>Buscar Ganador</span>
-            </button>
-          </div>
-          <div id="winner-result-lineales" class="hidden p-3.5 rounded-xl border"></div>
-        </div>
-
-        <div class="bg-brand-card border border-amber-500/20 rounded-2xl p-3.5 md:p-4 space-y-3">
-          <h4 class="text-sm font-black text-amber-300 flex items-center gap-2">
-            <i class="fa-solid fa-book"></i> Historial de Ganadores — Lineales
-          </h4>
-          <div class="overflow-x-auto rounded-xl border border-gray-800">
-            <table class="w-full text-left text-sm text-gray-300">
-              <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
-                <tr>
-                  <th class="p-2.5 md:p-3">Sorteo</th>
-                  <th class="p-2.5 md:p-3">Fila</th>
-                  <th class="p-2.5 md:p-3">Ganador</th>
-                  <th class="p-2.5 md:p-3">Teléfono</th>
-                  <th class="p-2.5 md:p-3">Fecha</th>
-                  <th class="p-2.5 md:p-3">Acción</th>
-                </tr>
-              </thead>
-              <tbody id="ganadores-lineales-table-body"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Bloqueo manual y tabla de filas -->
-        <div class="bg-black/20 border border-gray-800/60 rounded-2xl p-3.5 md:p-4 flex flex-col md:flex-row gap-3 items-end">
-          <div class="w-full md:w-1/2">
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Marcar fila como RESERVADA (Manual)</label>
-            <input type="text" id="admin-block-fila" placeholder="Ej: 1, 12, 25" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
-          </div>
-          <button onclick="adminBloquearFila()" class="w-full md:w-auto bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all">
-            Marcar Reservada
-          </button>
-        </div>
-
-        <div class="overflow-x-auto bg-brand-card rounded-2xl border border-gray-800">
-          <table class="w-full text-left text-sm text-gray-300">
-            <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
-              <tr>
-                <th class="p-3 md:p-4">Fila</th>
-                <th class="p-3 md:p-4">Números</th>
-                <th class="p-3 md:p-4">Cliente</th>
-                <th class="p-3 md:p-4">Teléfono</th>
-                <th class="p-3 md:p-4">Estado</th>
-                <th class="p-3 md:p-4">Acción</th>
-              </tr>
-            </thead>
-            <tbody id="admin-table-body-lineales"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- TALONARIO DE COMPRADORES (HISTORIAL COMPLETO) -->
       <div class="bg-emerald-950/20 border border-emerald-800/40 rounded-2xl p-4 md:p-6 space-y-3">
-        <h3 class="text-base md:text-lg font-black text-emerald-400 flex items-center gap-2">
-          <i class="fa-solid fa-book-bookmark"></i> Talonario de Compradores (Historial Completo)
-        </h3>
-        <p class="text-[11px] text-gray-400 leading-relaxed">
-          Guarda una copia permanente de TODAS las personas que reservaron o compraron boletas en este sorteo (nombre, teléfono, número y si ya pagaron).
-          Esta copia queda guardada aunque después reinicies los números para un sorteo nuevo — de hecho, al reiniciar se hace automáticamente por seguridad.
-        </p>
-        <button onclick="guardarTalonarioActual()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
-          <i class="fa-solid fa-floppy-disk"></i>
-          <span>Guardar Talonario del Sorteo Actual</span>
-        </button>
-
+        <h3 class="text-base md:text-lg font-black text-emerald-400 flex items-center gap-2"><i class="fa-solid fa-book-bookmark"></i> Talonario de Compradores (Historial)</h3>
+        <button onclick="guardarTalonarioActual()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-floppy-disk"></i><span>Guardar Talonario del Sorteo Actual</span></button>
         <div class="overflow-x-auto rounded-xl border border-gray-800 mt-2">
           <table class="w-full text-left text-sm text-gray-300">
             <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
-              <tr>
-                <th class="p-3 md:p-4">Sorteo</th>
-                <th class="p-3 md:p-4">Guardado el</th>
-                <th class="p-3 md:p-4"># Boletas</th>
-                <th class="p-3 md:p-4">Acción</th>
-              </tr>
+              <tr><th class="p-3 md:p-4">Sorteo</th><th class="p-3 md:p-4">Guardado el</th><th class="p-3 md:p-4"># Boletas</th><th class="p-3 md:p-4">Acción</th></tr>
             </thead>
             <tbody id="talonarios-table-body"></tbody>
           </table>
@@ -701,53 +265,26 @@
       </div>
 
       <div class="bg-red-950/20 border border-red-800/40 rounded-2xl p-4 md:p-6 space-y-3">
-        <h3 class="text-base md:text-lg font-black text-red-400 flex items-center gap-2">
-          <i class="fa-solid fa-triangle-exclamation"></i> Iniciar Nuevo Sorteo
-        </h3>
-        <p class="text-[11px] text-gray-400 leading-relaxed">
-          Esto borra TODAS las boletas reservadas y vendidas: los 100 números vuelven a quedar libres para todos.
-          No borra el título ni los premios (edítalos arriba). Antes de borrar se guarda automáticamente el talonario completo en el historial de arriba.
-          <strong class="text-red-300">El borrado de números no se puede deshacer.</strong>
-        </p>
-        <button onclick="reiniciarRifa()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
-          <i class="fa-solid fa-arrows-rotate"></i>
-          <span>Reiniciar Números (Nuevo Sorteo)</span>
-        </button>
+        <h3 class="text-base md:text-lg font-black text-red-400 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Iniciar Nuevo Sorteo</h3>
+        <p class="text-[11px] text-gray-400 leading-relaxed">Esto borra TODAS las boletas reservadas y vendidas. Antes de borrar se guarda automáticamente el talonario completo. <strong class="text-red-300">No se puede deshacer.</strong></p>
+        <button onclick="reiniciarRifa()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-arrows-rotate"></i><span>Reiniciar Números (Nuevo Sorteo)</span></button>
       </div>
 
       <div class="bg-gradient-to-r from-amber-500/10 to-amber-900/10 border border-amber-500/30 rounded-2xl p-4 md:p-6 space-y-4">
-        <h3 class="text-base md:text-lg font-black text-amber-400 flex items-center gap-2">
-          <i class="fa-solid fa-trophy"></i> Consultar Número Ganador
-        </h3>
+        <h3 class="text-base md:text-lg font-black text-amber-400 flex items-center gap-2"><i class="fa-solid fa-trophy"></i> Consultar Número Ganador</h3>
         <div class="flex flex-col md:flex-row gap-4 items-end">
-          <div class="w-full md:w-1/2">
-            <label class="block text-xs font-semibold text-gray-300 mb-1">Últimos 2 dígitos del resultado</label>
-            <input type="text" id="admin-winner-num" placeholder="Ej: 05, 42, 88" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
-          </div>
-          <button onclick="buscarGanador()" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-black font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <span>Buscar Ganador</span>
-          </button>
+          <div class="w-full md:w-1/2"><label class="block text-xs font-semibold text-gray-300 mb-1">Últimos 2 dígitos del resultado</label><input type="text" id="admin-winner-num" placeholder="Ej: 05, 42, 88" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
+          <button onclick="buscarGanador()" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-black font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-magnifying-glass"></i><span>Buscar Ganador</span></button>
         </div>
         <div id="winner-result" class="hidden p-4 rounded-xl border"></div>
       </div>
 
       <div class="bg-brand-card border border-amber-500/20 rounded-2xl p-4 md:p-6 space-y-4">
-        <h3 class="text-base md:text-lg font-black text-amber-300 flex items-center gap-2">
-          <i class="fa-solid fa-book"></i> Historial de Ganadores (Talonario)
-        </h3>
-        <p class="text-[11px] text-gray-500">Queda guardado permanentemente, aunque después reinicies los números para un nuevo sorteo.</p>
+        <h3 class="text-base md:text-lg font-black text-amber-300 flex items-center gap-2"><i class="fa-solid fa-book"></i> Historial de Ganadores</h3>
         <div class="overflow-x-auto rounded-xl border border-gray-800">
           <table class="w-full text-left text-sm text-gray-300">
             <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
-              <tr>
-                <th class="p-3 md:p-4">Sorteo</th>
-                <th class="p-3 md:p-4">Boleta</th>
-                <th class="p-3 md:p-4">Ganador</th>
-                <th class="p-3 md:p-4">Teléfono</th>
-                <th class="p-3 md:p-4">Fecha</th>
-                <th class="p-3 md:p-4">Acción</th>
-              </tr>
+              <tr><th class="p-3 md:p-4">Sorteo</th><th class="p-3 md:p-4">Boleta</th><th class="p-3 md:p-4">Ganador</th><th class="p-3 md:p-4">Teléfono</th><th class="p-3 md:p-4">Fecha</th><th class="p-3 md:p-4">Acción</th></tr>
             </thead>
             <tbody id="ganadores-table-body"></tbody>
           </table>
@@ -755,25 +292,14 @@
       </div>
 
       <div class="bg-brand-card border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row gap-4 items-end">
-        <div class="w-full md:w-1/2">
-          <label class="block text-xs font-semibold text-gray-300 mb-1">Marcar número como RESERVADO (Manual)</label>
-          <input type="text" id="admin-block-num" placeholder="Ej: 05, 12, 99" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
-        </div>
-        <button onclick="adminBloquearNumero()" class="w-full md:w-auto bg-gray-800 hover:bg-gray-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all">
-          Marcar Reservado
-        </button>
+        <div class="w-full md:w-1/2"><label class="block text-xs font-semibold text-gray-300 mb-1">Marcar número como RESERVADO (Manual)</label><input type="text" id="admin-block-num" placeholder="Ej: 05, 12, 99" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
+        <button onclick="adminBloquearNumero()" class="w-full md:w-auto bg-gray-800 hover:bg-gray-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all">Marcar Reservado</button>
       </div>
 
       <div class="overflow-x-auto bg-brand-card rounded-2xl border border-gray-800">
         <table class="w-full text-left text-sm text-gray-300">
           <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
-            <tr>
-              <th class="p-3 md:p-4">Número</th>
-              <th class="p-3 md:p-4">Cliente</th>
-              <th class="p-3 md:p-4">Teléfono</th>
-              <th class="p-3 md:p-4">Estado</th>
-              <th class="p-3 md:p-4">Acción</th>
-            </tr>
+            <tr><th class="p-3 md:p-4">Número</th><th class="p-3 md:p-4">Cliente</th><th class="p-3 md:p-4">Teléfono</th><th class="p-3 md:p-4">Estado</th><th class="p-3 md:p-4">Acción</th></tr>
           </thead>
           <tbody id="admin-table-body"></tbody>
         </table>
@@ -781,37 +307,24 @@
     </div>
   </div>
 
-  <!-- DETALLE DE UN TALONARIO GUARDADO -->
   <div id="modal-talonario-detalle" class="fixed inset-0 bg-black/90 backdrop-blur-lg hidden items-center justify-center p-4 z-[60]">
     <div class="bg-brand-card border border-gray-800 rounded-3xl p-5 md:p-8 max-w-3xl w-full shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-gray-800 pb-3">
         <h3 id="talonario-detalle-titulo" class="text-lg md:text-xl font-black text-white">Talonario</h3>
-        <button onclick="cerrarTalonarioDetalle()" class="text-gray-500 hover:text-white transition-colors">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <button onclick="cerrarTalonarioDetalle()" class="text-gray-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-
       <div class="flex flex-wrap items-center gap-4 text-[11px] text-gray-400 bg-black/30 p-3 rounded-xl border border-gray-800/60">
         <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-brand-card border border-gray-700"></span><span>No vendida</span></div>
-        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-amber-900/50 border border-amber-700"></span><span class="text-amber-300">Reservado (sin pagar)</span></div>
-        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-red-950 border border-red-800"></span><span class="text-red-400">Vendido / Pagado</span></div>
+        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-amber-900/50 border border-amber-700"></span><span class="text-amber-300">Reservado</span></div>
+        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-red-950 border border-red-800"></span><span class="text-red-400">Vendido</span></div>
       </div>
-
-      <!-- Cuadrícula tipo talonario físico -->
       <div id="talonario-detalle-grid" class="grid grid-cols-[repeat(auto-fill,minmax(52px,1fr))] gap-2"></div>
-
-      <!-- Detalle de compradores (nombre / teléfono) para copiar rápido -->
       <div class="pt-2">
         <p class="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">Detalle de compradores</p>
         <div class="overflow-x-auto rounded-xl border border-gray-800">
           <table class="w-full text-left text-sm text-gray-300">
             <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
-              <tr>
-                <th class="p-2.5">Número</th>
-                <th class="p-2.5">Nombre</th>
-                <th class="p-2.5">Teléfono</th>
-                <th class="p-2.5">Estado</th>
-              </tr>
+              <tr><th class="p-2.5">Número</th><th class="p-2.5">Nombre</th><th class="p-2.5">Teléfono</th><th class="p-2.5">Estado</th></tr>
             </thead>
             <tbody id="talonario-detalle-body"></tbody>
           </table>
@@ -821,30 +334,13 @@
   </div>
 
   <script>
-    // CAMBIA ESTE NÚMERO POR TU NÚMERO REAL CON CÓDIGO DE PAÍS (57 para Colombia)
     const ADMIN_WHATSAPP = '573224943553';
     let selectedNumbers = [];
     let occupiedNumbers = {};
-    let raffleConfig = {
-      titulo: 'PYA Sorteos',
-      precio: '',
-      fecha: '',
-      ubicacion: '',
-      banner: '',
-      linealesBanner: '',
-      linealesActivo: false,
-      linealesPrecio: '',
-      premios: [
-        { label: 'Dos últimas', valor: '50.000' },
-        { label: 'Dos primeras', valor: '20.000' },
-        { label: 'Dos del medio', valor: '10.000' }
-      ]
-    };
+    let raffleConfig = { titulo: 'PYA Sorteos', precio: '', fecha: '', ubicacion: '', banner: '', premios: [{ label: 'Dos últimas', valor: '50.000' }, { label: 'Dos primeras', valor: '20.000' }, { label: 'Dos del medio', valor: '10.000' }] };
+    const ADMIN_USER_B64 = 'UFlBYWRtaW4yNg==';
+    const ADMIN_PASS_B64 = 'QURNSU5weWEyNg==';
 
-    const ADMIN_USER_B64 = 'UFlBYWRtaW4yNg=='; // Usuario: PYAadmin26
-    const ADMIN_PASS_B64 = 'QURNSU5weWEyNg=='; // Clave: ADMINpya26
-
-    // Conexión a Firebase Realtime Database
     const firebaseConfig = {
       apiKey: "AIzaSyBAnWbrKHwf4oPObeZPhhxBv-8LalwIGBU",
       authDomain: "pya-rifas.firebaseapp.com",
@@ -855,9 +351,7 @@
       appId: "1:292674445176:web:aaa9977e42afb506b6728d"
     };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const ocupadosRef = db.ref('ocupados');
     const configRef = db.ref('config');
@@ -867,847 +361,7 @@
     let ultimoGanadorEncontrado = null;
     let talonariosData = {};
 
-    // -------- SORTEO LINEALES (25 filas x 4 números: fila r -> r-1, r+24, r+49, r+74) --------
-    const LINEALES_FILAS = Array.from({ length: 25 }, (_, i) => {
-      const base = i; // 0..24
-      return [base, base + 25, base + 50, base + 75].map(n => n.toString().padStart(2, '0'));
-    });
-
-    function emojiKeycap(n) {
-      if (n === 10) return '🔟';
-      const map = { '0': '0️⃣', '1': '1️⃣', '2': '2️⃣', '3': '3️⃣', '4': '4️⃣', '5': '5️⃣', '6': '6️⃣', '7': '7️⃣', '8': '8️⃣', '9': '9️⃣' };
-      return n.toString().split('').map(d => map[d]).join('');
-    }
-
-    // Nodos de Firebase EXCLUSIVOS del Sorteo Lineales (independiente del sorteo principal)
-    const linealesOcupadosRef = db.ref('linealesOcupados');
-    const linealesTalonariosRef = db.ref('linealesTalonarios');
-    const ganadoresLinealesRef = db.ref('ganadoresLineales');
-
-    let selectedFilas = [];
-    let linealesOcupados = {};
-    let linealesTalonariosData = {};
-    let ultimoGanadorLineal = null;
-
-    function estadoFila(filaKey) {
-      const data = linealesOcupados[filaKey];
-      if (!data) return 'libre';
-      return estaPagado(data) ? 'pagado' : 'reservado';
-    }
-
-    function renderLineales() {
-      const section = document.getElementById('sorteo-lineales-section');
-      if (!raffleConfig.linealesActivo) {
-        section.classList.add('hidden');
-        return;
-      }
-      section.classList.remove('hidden');
-
-      const precioHero = document.getElementById('lineales-precio-hero');
-      if (raffleConfig.linealesPrecio) {
-        precioHero.innerHTML = `<i class="fa-solid fa-ticket text-amber-400"></i> ${raffleConfig.linealesPrecio} / fila`;
-        precioHero.classList.remove('hidden');
-        precioHero.classList.add('flex');
-      } else {
-        precioHero.classList.add('hidden');
-        precioHero.classList.remove('flex');
-      }
-
-      const linealesKeys = Object.keys(linealesOcupados);
-      const linealesVendidos = linealesKeys.filter(k => estaPagado(linealesOcupados[k])).length;
-      const linealesReservados = linealesKeys.length - linealesVendidos;
-      document.getElementById('lineales-stat-libres').innerText = 25 - linealesKeys.length;
-      document.getElementById('lineales-stat-reservados').innerText = linealesReservados;
-      document.getElementById('lineales-stat-vendidos').innerText = linealesVendidos;
-
-      const grid = document.getElementById('lineales-grid');
-      grid.innerHTML = LINEALES_FILAS.map((_, idx) => {
-        const filaKey = (idx + 1).toString().padStart(2, '0');
-        const filaLabel = emojiKeycap(idx + 1);
-        const nums = getFilaNumeros(idx);
-        const estado = estadoFila(filaKey);
-        const data = linealesOcupados[filaKey];
-        const isOccupied = estado !== 'libre';
-        const isSelected = selectedFilas.includes(filaKey);
-        const nombreCorto = (isOccupied && typeof data === 'object' && data.nombre) ? data.nombre.split(' ')[0] : '';
-
-        let rowStyle = 'w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 md:px-3 md:py-2 border transition-all text-left ';
-        if (estado === 'pagado') rowStyle += 'bg-red-950/30 border-red-900/50 opacity-70 cursor-not-allowed';
-        else if (estado === 'reservado') rowStyle += 'bg-amber-900/20 border-amber-700/50 opacity-80 cursor-not-allowed';
-        else if (isSelected) rowStyle += 'bg-amber-500/10 border-2 border-amber-400 shadow-lg shadow-amber-500/20';
-        else rowStyle += 'bg-black/30 border-gray-800/60 hover:border-amber-500/50 cursor-pointer';
-
-        const chips = nums.map(numStr => {
-          let chipStyle = 'flex-1 text-center rounded-xl py-2 text-xs md:text-sm font-black border transition-all flex items-center justify-center gap-1 ';
-          if (estado === 'pagado') chipStyle += 'bg-red-950/40 border-red-800 text-red-400';
-          else if (estado === 'reservado') chipStyle += 'bg-amber-900/40 border-amber-700 text-amber-300';
-          else if (isSelected) chipStyle += 'bg-gradient-to-tr from-amber-500 to-amber-400 border-amber-300 text-black shadow-md shadow-amber-500/30 scale-105';
-          else chipStyle += 'bg-brand-card border-gray-800 text-gray-300';
-          const check = (isSelected && estado === 'libre') ? '<i class="fa-solid fa-check text-[9px] md:text-[10px]"></i>' : '';
-          return `<span class="${chipStyle}">${check}${numStr}</span>`;
-        }).join('');
-
-        return `
-          <button type="button" ${isOccupied ? 'disabled' : ''} onclick="toggleFilaSelection('${filaKey}')" class="${rowStyle}">
-            <span class="shrink-0 text-sm md:text-base w-8 md:w-9 text-center">${filaLabel}</span>
-            <div class="flex-1 flex gap-1.5 md:gap-2">${chips}</div>
-            ${nombreCorto ? `<span class="shrink-0 text-[9px] md:text-[10px] text-gray-400 max-w-[60px] truncate">${nombreCorto}</span>` : ''}
-          </button>
-        `;
-      }).join('');
-
-      updateLinealesCart();
-    }
-
-    function toggleFilaSelection(filaKey) {
-      if (selectedFilas.includes(filaKey)) {
-        selectedFilas = selectedFilas.filter(f => f !== filaKey);
-      } else {
-        selectedFilas.push(filaKey);
-      }
-      renderLineales();
-          actualizarBannerLineales();
-    }
-
-    function updateLinealesCart() {
-      const cart = document.getElementById('lineales-cart');
-      const list = document.getElementById('lineales-selected-list');
-      if (selectedFilas.length > 0) {
-        cart.classList.remove('hidden');
-        cart.classList.add('flex');
-        list.innerHTML = selectedFilas.map(f =>
-          `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold px-2 py-0.5 rounded-lg text-[10px] md:text-xs">Fila ${parseInt(f, 10)}</span>`
-        ).join('');
-      } else {
-        cart.classList.add('hidden');
-        cart.classList.remove('flex');
-      }
-    }
-
-    function openCheckoutModalLineales() {
-      document.getElementById('user-filas').value = selectedFilas.map(f => parseInt(f, 10)).join(', ');
-      document.getElementById('user-name-lineales').value = '';
-      document.getElementById('user-phone-lineales').value = '';
-      document.getElementById('modal-checkout-lineales').classList.remove('hidden');
-      document.getElementById('modal-checkout-lineales').classList.add('flex');
-    }
-
-    function closeCheckoutModalLineales() {
-      document.getElementById('modal-checkout-lineales').classList.add('hidden');
-      document.getElementById('modal-checkout-lineales').classList.remove('flex');
-    }
-
-    async function handleReservaLineales(e) {
-      e.preventDefault();
-
-      const name = document.getElementById('user-name-lineales').value.trim();
-      const phone = document.getElementById('user-phone-lineales').value.trim();
-
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span>Verificando...</span>';
-
-      let current;
-      try {
-        const snapshot = await linealesOcupadosRef.once('value');
-        current = snapshot.val() || {};
-      } catch (err) {
-        alert('No se pudo conectar con la base de datos. Revisa tu internet e inténtalo de nuevo.');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
-        return;
-      }
-
-      const conflictos = selectedFilas.filter(f => current[f]);
-      if (conflictos.length > 0) {
-        linealesOcupados = current;
-        selectedFilas = selectedFilas.filter(f => !conflictos.includes(f));
-        renderLineales();
-          actualizarBannerLineales();
-        closeCheckoutModalLineales();
-        alert(`¡Justo a tiempo! Las siguientes filas ya fueron apartadas por otra persona: ${conflictos.map(f => parseInt(f, 10)).join(', ')}.\n\nLas quitamos de tu selección. Por favor elige otras filas.`);
-        return;
-      }
-
-      const confirmar = confirm(`¿Seguro son todas las filas que escogerás? (${selectedFilas.map(f => parseInt(f, 10)).join(', ')})\nPor favor, verifica tus datos antes de continuar.`);
-      if (!confirmar) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
-        return;
-      }
-
-      const updates = {};
-      selectedFilas.forEach(filaKey => {
-        updates[filaKey] = {
-          nombre: name,
-          telefono: phone,
-          fecha: new Date().toLocaleDateString(),
-          pagado: false
-        };
-      });
-
-      try {
-        await linealesOcupadosRef.update(updates);
-      } catch (err) {
-        alert('Ocurrió un error al guardar tu reserva. Inténtalo de nuevo.');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
-        return;
-      }
-
-      const filasTexto = selectedFilas.map(f => {
-        const idx = parseInt(f, 10) - 1;
-        return `Fila ${parseInt(f, 10)} (${getFilaNumeros(idx).join('-')})`;
-      }).join(' | ');
-
-      const mensaje = `Hola PYA, quiero hacer la reserva de mis filas del *Sorteo Lineales*:%0A%0A` +
-        `👤 *Nombre:* ${encodeURIComponent(name)}%0A` +
-        `📱 *Teléfono:* ${encodeURIComponent(phone)}%0A` +
-        `🎟️ *Fila(s):* ${encodeURIComponent(filasTexto)}%0A%0A` +
-        `Quedo atento a las instrucciones para enviar el comprobante de pago.`;
-
-      window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${mensaje}`, '_blank');
-
-      selectedFilas = [];
-      closeCheckoutModalLineales();
-      renderLineales();
-          actualizarBannerLineales();
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
-    }
-
-    // -------- ADMIN: TABLA DE FILAS (LINEALES) --------
-    function renderAdminTableLineales() {
-      const tbody = document.getElementById('admin-table-body-lineales');
-      if (!tbody) return;
-      const keys = Object.keys(linealesOcupados);
-      if (keys.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500 text-xs">No hay filas marcadas como reservadas o vendidas.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = keys.sort().map(filaKey => {
-        const data = linealesOcupados[filaKey];
-        const cliente = (typeof data === 'object') ? (data.nombre || 'Bloqueado por Admin') : 'Bloqueado por Admin';
-        const telefono = (typeof data === 'object') ? (data.telefono || 'N/A') : 'N/A';
-        const pagado = estaPagado(data);
-        const idx = parseInt(filaKey, 10) - 1;
-        const numeros = getFilaNumeros(idx).join('-');
-        return `
-          <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
-            <td class="p-3 md:p-4 font-black text-amber-400 text-sm md:text-base">${parseInt(filaKey, 10)}</td>
-            <td class="p-3 md:p-4 text-gray-400 text-xs">${numeros}</td>
-            <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${cliente}</td>
-            <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${telefono}</td>
-            <td class="p-3 md:p-4">
-              <span class="px-2 py-1 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-950/40 border-red-800 text-red-300' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">
-                ${pagado ? 'PAGADO' : 'RESERVADO'}
-              </span>
-            </td>
-            <td class="p-3 md:p-4 flex flex-wrap gap-2">
-              <button onclick="adminTogglePagadoLineales('${filaKey}')" class="${pagado ? 'bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border-amber-500/30' : 'bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 border-red-500/30'} border px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
-                ${pagado ? 'Marcar Reservado' : 'Ya Pagó'}
-              </button>
-              <button onclick="adminLiberarFila('${filaKey}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-black border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
-                Liberar
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function adminTogglePagadoLineales(filaKey) {
-      const data = linealesOcupados[filaKey];
-      const actual = estaPagado(data);
-      linealesOcupadosRef.child(filaKey).update({ pagado: !actual });
-    }
-
-    function adminBloquearFila() {
-      const val = document.getElementById('admin-block-fila').value.trim();
-      if (!val) return;
-      const n = parseInt(val, 10);
-      if (!n || n < 1 || n > 25) {
-        alert('La fila debe ser un número entre 1 y 25.');
-        return;
-      }
-      const filaKey = n.toString().padStart(2, '0');
-      linealesOcupadosRef.child(filaKey).set({
-        nombre: 'Bloqueado Manualmente',
-        telefono: 'N/A',
-        fecha: new Date().toLocaleDateString(),
-        pagado: false
-      });
-      document.getElementById('admin-block-fila').value = '';
-    }
-
-    function adminLiberarFila(filaKey) {
-      linealesOcupadosRef.child(filaKey).remove();
-    }
-
-    // -------- ADMIN: GANADOR LINEALES --------
-    function buscarGanadorLineal() {
-      const input = document.getElementById('admin-winner-fila').value.trim();
-      const resContainer = document.getElementById('winner-result-lineales');
-      resContainer.classList.remove('hidden');
-      ultimoGanadorLineal = null;
-
-      const n = parseInt(input, 10);
-      if (!n || n < 1 || n > 25) {
-        resContainer.className = "p-3.5 rounded-xl border bg-red-950/40 border-red-800 text-red-300 text-sm space-y-1";
-        resContainer.innerHTML = `<p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> Escribe un número de fila válido (1 a 25).</p>`;
-        return;
-      }
-
-      const filaKey = n.toString().padStart(2, '0');
-      const data = linealesOcupados[filaKey];
-      const numeros = getFilaNumeros(n - 1).join('-');
-
-      if (!data) {
-        resContainer.className = "p-3.5 rounded-xl border bg-red-950/40 border-red-800 text-red-300 text-sm space-y-1";
-        resContainer.innerHTML = `
-          <p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> La fila ${n} (${numeros}) NO fue vendida / comprada.</p>
-          <p class="text-xs text-red-400">El premio queda vacante o acumula según las políticas del sorteo.</p>
-        `;
-        return;
-      }
-
-      const cliente = (typeof data === 'object') ? (data.nombre || 'Sin nombre asignado') : 'Sin nombre asignado';
-      const telefono = (typeof data === 'object') ? (data.telefono || '') : '';
-
-      let cleanPhone = telefono.replace(/\D/g, '');
-      if (cleanPhone.length === 10) cleanPhone = '57' + cleanPhone;
-
-      const mensajeGanador = `¡Hola ${cliente}! 🎉🥳%0A%0ATenemos excelentes noticias de *PYA SORTEOS - LINEALES*. Tu fila *${n} (${numeros})* ha sido la *GANADORA*. 🏆%0A%0APor favor respóndenos a este mensaje para coordinar la entrega de tu premio.%0A%0A¡Muchas felicidades! 👏`;
-
-      ultimoGanadorLineal = { fila: n, numeros, nombre: cliente, telefono: telefono || '' };
-
-      resContainer.className = "p-3.5 rounded-xl border bg-emerald-950/40 border-emerald-800 text-emerald-200 text-sm space-y-3";
-      resContainer.innerHTML = `
-        <div class="flex items-center gap-2 font-bold text-emerald-400">
-          <i class="fa-solid fa-trophy text-amber-400 text-lg"></i>
-          <span>¡FILA GANADORA ENCONTRADA!</span>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs bg-black/40 p-3 rounded-lg border border-emerald-800/50">
-          <p><strong class="text-gray-400">Fila:</strong> <span class="text-amber-400 font-bold text-sm">${n} (${numeros})</span></p>
-          <p><strong class="text-gray-400">Ganador(a):</strong> <span class="text-white font-bold">${cliente}</span></p>
-          <p><strong class="text-gray-400">Teléfono:</strong> <span class="text-white font-bold">${telefono || 'N/A'}</span></p>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          ${cleanPhone ? `
-            <a href="https://wa.me/${cleanPhone}?text=${mensajeGanador}" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/20">
-              <i class="fa-brands fa-whatsapp text-base"></i>
-              <span>Notificar Ganador por WhatsApp</span>
-            </a>
-          ` : `<p class="text-xs text-amber-400 font-semibold">Esta fila fue bloqueada manualmente y no tiene un teléfono registrado.</p>`}
-          <button onclick="guardarGanadorLinealActual()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all">
-            <i class="fa-solid fa-bookmark"></i>
-            <span>Guardar en Historial</span>
-          </button>
-        </div>
-      `;
-    }
-
-    function guardarGanadorLinealActual() {
-      if (!ultimoGanadorLineal) return;
-      ganadoresLinealesRef.push({
-        sorteo: raffleConfig.titulo || 'Sin título',
-        fila: ultimoGanadorLineal.fila,
-        numeros: ultimoGanadorLineal.numeros,
-        nombre: ultimoGanadorLineal.nombre,
-        telefono: ultimoGanadorLineal.telefono || '',
-        fecha: new Date().toLocaleDateString()
-      }).then(() => {
-        alert('Ganador de Lineales guardado en el historial.');
-      }).catch(() => {
-        alert('No se pudo guardar en el historial. Revisa tu conexión.');
-      });
-    }
-
-    function eliminarGanadorLineal(key) {
-      if (!confirm('¿Borrar este registro del historial de ganadores de Lineales?')) return;
-      ganadoresLinealesRef.child(key).remove();
-    }
-
-    function renderGanadoresLinealesTable(data) {
-      const tbody = document.getElementById('ganadores-lineales-table-body');
-      if (!tbody) return;
-      const entries = Object.entries(data).reverse();
-      if (entries.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500 text-xs">Todavía no hay ganadores guardados.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = entries.map(([key, g]) => `
-        <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
-          <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${g.sorteo || '-'}</td>
-          <td class="p-3 md:p-4 font-black text-amber-400 text-sm">${g.fila || '-'} ${g.numeros ? `(${g.numeros})` : ''}</td>
-          <td class="p-3 md:p-4 text-white text-xs md:text-sm">${g.nombre || '-'}</td>
-          <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${g.telefono || 'N/A'}</td>
-          <td class="p-3 md:p-4 text-gray-400 text-xs">${g.fecha || '-'}</td>
-          <td class="p-3 md:p-4">
-            <button onclick="eliminarGanadorLineal('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
-              Borrar
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    // -------- ADMIN: TALONARIO Y REINICIO DE LINEALES --------
-    function construirSnapshotTalonarioLineales() {
-      return {
-        sorteo: raffleConfig.titulo || 'Sin título',
-        fechaGuardado: new Date().toLocaleString(),
-        filas: JSON.parse(JSON.stringify(linealesOcupados))
-      };
-    }
-
-    function guardarTalonarioLinealesActual() {
-      const keys = Object.keys(linealesOcupados);
-      if (keys.length === 0) {
-        alert('Todavía no hay ninguna fila reservada o vendida para guardar.');
-        return;
-      }
-      if (!confirm(`¿Guardar el talonario de Lineales actual con ${keys.length} fila(s) registradas? Esto NO borra las filas actuales.`)) return;
-
-      linealesTalonariosRef.push(construirSnapshotTalonarioLineales()).then(() => {
-        alert('Talonario de Lineales guardado correctamente en el historial.');
-      }).catch(() => {
-        alert('No se pudo guardar el talonario. Revisa tu conexión.');
-      });
-    }
-
-    function renderTalonariosLinealesTable() {
-      const tbody = document.getElementById('talonarios-lineales-table-body');
-      if (!tbody) return;
-      const entries = Object.entries(linealesTalonariosData).reverse();
-      if (entries.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-500 text-xs">Todavía no hay talonarios de Lineales guardados.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = entries.map(([key, t]) => {
-        const cantidad = t.filas ? Object.keys(t.filas).length : 0;
-        return `
-          <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
-            <td class="p-2.5 md:p-3 text-white font-medium text-xs md:text-sm">${t.sorteo || '-'}</td>
-            <td class="p-2.5 md:p-3 text-gray-400 text-xs">${t.fechaGuardado || '-'}</td>
-            <td class="p-2.5 md:p-3 text-amber-400 font-bold text-sm">${cantidad}</td>
-            <td class="p-2.5 md:p-3">
-              <button onclick="eliminarTalonarioLineales('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Borrar</button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function eliminarTalonarioLineales(key) {
-      if (!confirm('¿Borrar este talonario de Lineales guardado? Esta acción no se puede deshacer.')) return;
-      linealesTalonariosRef.child(key).remove();
-    }
-
-    function reiniciarLineales() {
-      const paso1 = confirm('¿Seguro que quieres iniciar un NUEVO SORTEO LINEALES?\n\nEsto borrará TODAS las filas reservadas y vendidas actuales de Lineales (no afecta el sorteo principal).\n\nAntes de borrar, se guardará automáticamente una copia del talonario actual en el historial.\n\nEsta acción NO se puede deshacer.');
-      if (!paso1) return;
-
-      const paso2 = prompt('Para confirmar, escribe la palabra REINICIAR (en mayúsculas):');
-      if (paso2 !== 'REINICIAR') {
-        alert('No se realizó el reinicio porque el texto no coincidió.');
-        return;
-      }
-
-      const keys = Object.keys(linealesOcupados);
-      const guardarPrimero = keys.length > 0
-        ? linealesTalonariosRef.push(construirSnapshotTalonarioLineales())
-        : Promise.resolve();
-
-      guardarPrimero.then(() => {
-        const updates = {};
-        for (let i = 1; i <= 25; i++) {
-          updates[i.toString().padStart(2, '0')] = null;
-        }
-        return linealesOcupadosRef.update(updates);
-      }).then(() => {
-        alert('¡Listo! Se guardó el talonario anterior de Lineales (si tenía filas) y todas las filas quedaron libres.');
-      }).catch(() => {
-        alert('No se pudo reiniciar Lineales. Revisa tu conexión.');
-      });
-    }
-
-    // -------- ADMIN: GUARDAR CONFIG PROPIA DE LINEALES (no toca los campos del sorteo principal) --------
-    
-function setBannerValueLineales(dataUrl) {
-  document.getElementById('cfg-lineales-banner').value = dataUrl;
-  const preview = document.getElementById('cfg-lineales-banner-preview');
-  const empty = document.getElementById('cfg-lineales-banner-preview-empty');
-  preview.src = dataUrl;
-  preview.classList.remove('hidden');
-  empty.classList.add('hidden');
-}
-
-function quitarBannerLineales() {
-  document.getElementById('cfg-lineales-banner').value = '';
-  document.getElementById('cfg-lineales-banner-file').value = '';
-  document.getElementById('cfg-lineales-banner-preview').classList.add('hidden');
-  document.getElementById('cfg-lineales-banner-preview-empty').classList.remove('hidden');
-  document.getElementById('cfg-lineales-banner-status').innerText = 'Se quitará al guardar la configuración.';
-}
-
-function handleLinealesBannerFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const statusEl = document.getElementById('cfg-lineales-banner-status');
-  statusEl.innerText = 'Procesando imagen...';
-
-  // Los GIF no se pueden comprimir sin perder la animación: se validan por peso.
-  if (file.type === 'image/gif') {
-    if (file.size > 350 * 1024) {
-      statusEl.innerText = 'Ese GIF pesa mucho (máx. ~350KB). Elige uno más liviano para que cargue rápido en el celular de todos.';
-      event.target.value = '';
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setBannerValueLineales(ev.target.result);
-      statusEl.innerText = 'GIF listo. No olvides pulsar "Guardar Config. Lineales".';
-    };
-    reader.readAsDataURL(file);
-    return;
-  }
-
-  // Fotos normales: se redimensionan y comprimen en el navegador antes de guardarlas.
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const img = new Image();
-    img.onload = () => {
-      const maxDim = 400;
-      let w = img.width, h = img.height;
-      if (w > h && w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
-      else if (h >= w && h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-      setBannerValueLineales(dataUrl);
-      statusEl.innerText = 'Imagen lista. No olvides pulsar "Guardar Config. Lineales".';
-    };
-    img.src = ev.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function actualizarBannerLineales() {
-  const img = document.getElementById("lineales-banner-img");
-  const fallback = document.getElementById("lineales-banner-fallback");
-  if (!img || !fallback) return;
-  if (raffleConfig.linealesBanner) {
-    img.src = raffleConfig.linealesBanner;
-    img.classList.remove("hidden");
-    fallback.classList.add("hidden");
-  } else {
-    img.classList.add("hidden");
-    fallback.classList.remove("hidden");
-  }
-}
-
-function guardarConfigLineales() {
-
-  const nuevaConfig = Object.assign({}, raffleConfig, {
-    linealesActivo: document.getElementById('cfg-lineales-activo').checked,
-    linealesPrecio: document.getElementById('cfg-lineales-precio').value.trim(),
-    linealesBanner: document.getElementById('cfg-lineales-banner').value.trim()
-  });
-
-  configRef.set(nuevaConfig)
-    .then(() => {
-      alert('Configuración de Sorteo Lineales guardada correctamente.');
-      raffleConfig.linealesBanner = nuevaConfig.linealesBanner;
-      actualizarBannerLineales();
-    })
-    .catch((error) => {
-      console.error(error);
-      alert('Error al guardar la configuración.');
-    });
-}
-
-    // Escuchadores en tiempo real EXCLUSIVOS del Sorteo Lineales
-    linealesOcupadosRef.on('value', (snapshot) => {
-      linealesOcupados = snapshot.val() || {};
-      renderLineales();
-          actualizarBannerLineales();
-      if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) {
-        renderAdminTableLineales();
-      }
-    });
-
-    linealesTalonariosRef.on('value', (snapshot) => {
-      linealesTalonariosData = snapshot.val() || {};
-      renderTalonariosLinealesTable();
-    });
-
-    ganadoresLinealesRef.on('value', (snapshot) => {
-      renderGanadoresLinealesTable(snapshot.val() || {});
-    });
-
-    // Escuchador en tiempo real del historial de ganadores (talonario de ganadores) — sorteo principal
-    ganadoresRef.on('value', (snapshot) => {
-      renderGanadoresTable(snapshot.val() || {});
-    });
-
-    // Escuchador en tiempo real del historial de talonarios (compradores completos) — sorteo principal
-    talonariosRef.on('value', (snapshot) => {
-      talonariosData = snapshot.val() || {};
-      renderTalonariosTable();
-    });
-
-    function renderGanadoresTable(data) {
-      const tbody = document.getElementById('ganadores-table-body');
-      if (!tbody) return;
-      const entries = Object.entries(data).reverse();
-
-      if (entries.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500 text-xs">Todavía no hay ganadores guardados.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = entries.map(([key, g]) => `
-        <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
-          <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${g.sorteo || '-'}</td>
-          <td class="p-3 md:p-4 font-black text-amber-400 text-sm">${g.numero || '-'}</td>
-          <td class="p-3 md:p-4 text-white text-xs md:text-sm">${g.nombre || '-'}</td>
-          <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${g.telefono || 'N/A'}</td>
-          <td class="p-3 md:p-4 text-gray-400 text-xs">${g.fecha || '-'}</td>
-          <td class="p-3 md:p-4">
-            <button onclick="eliminarGanador('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
-              Borrar
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function guardarGanadorActual() {
-      if (!ultimoGanadorEncontrado) return;
-      ganadoresRef.push({
-        sorteo: raffleConfig.titulo || 'Sin título',
-        numero: ultimoGanadorEncontrado.numero,
-        nombre: ultimoGanadorEncontrado.nombre,
-        telefono: ultimoGanadorEncontrado.telefono || '',
-        fecha: new Date().toLocaleDateString()
-      }).then(() => {
-        alert('Ganador guardado en el historial.');
-      }).catch(() => {
-        alert('No se pudo guardar en el historial. Revisa tu conexión.');
-      });
-    }
-
-    function eliminarGanador(key) {
-      if (!confirm('¿Borrar este registro del historial de ganadores?')) return;
-      ganadoresRef.child(key).remove();
-    }
-
-    // -------- TALONARIO DE COMPRADORES (HISTORIAL COMPLETO) --------
-    function renderTalonariosTable() {
-      const tbody = document.getElementById('talonarios-table-body');
-      if (!tbody) return;
-      const entries = Object.entries(talonariosData).reverse();
-
-      if (entries.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 text-xs">Todavía no hay talonarios guardados.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = entries.map(([key, t]) => {
-        const cantidad = t.numeros ? Object.keys(t.numeros).length : 0;
-        return `
-          <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
-            <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${t.sorteo || '-'}</td>
-            <td class="p-3 md:p-4 text-gray-400 text-xs">${t.fechaGuardado || '-'}</td>
-            <td class="p-3 md:p-4 text-amber-400 font-bold text-sm">${cantidad}</td>
-            <td class="p-3 md:p-4 flex flex-wrap gap-2">
-              <button onclick="verTalonario('${key}')" class="bg-indigo-500/10 hover:bg-indigo-500 text-indigo-300 hover:text-white border border-indigo-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Ver</button>
-              <button onclick="eliminarTalonario('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Borrar</button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function construirSnapshotTalonario() {
-      return {
-        sorteo: raffleConfig.titulo || 'Sin título',
-        fechaSorteo: raffleConfig.fecha || '',
-        precio: raffleConfig.precio || '',
-        fechaGuardado: new Date().toLocaleString(),
-        numeros: JSON.parse(JSON.stringify(occupiedNumbers))
-      };
-    }
-
-    function guardarTalonarioActual() {
-      const keys = Object.keys(occupiedNumbers);
-      if (keys.length === 0) {
-        alert('Todavía no hay ningún número reservado o vendido para guardar.');
-        return;
-      }
-      if (!confirm(`¿Guardar el talonario actual con ${keys.length} boleta(s) registradas? Esto queda guardado permanentemente y NO borra los números actuales.`)) return;
-
-      talonariosRef.push(construirSnapshotTalonario()).then(() => {
-        alert('Talonario guardado correctamente en el historial.');
-      }).catch(() => {
-        alert('No se pudo guardar el talonario. Revisa tu conexión.');
-      });
-    }
-
-    function verTalonario(key) {
-      const t = talonariosData[key];
-      if (!t) return;
-      document.getElementById('talonario-detalle-titulo').innerText = `${t.sorteo || 'Sorteo'} — ${t.fechaGuardado || ''}`;
-      const numeros = t.numeros || {};
-
-      // -------- Cuadrícula tipo talonario físico (00 a 99) --------
-      const grid = document.getElementById('talonario-detalle-grid');
-      let gridHtml = '';
-      for (let i = 0; i < 100; i++) {
-        const numStr = i.toString().padStart(2, '0');
-        const data = numeros[numStr];
-        const isOccupied = !!data;
-        const isPaid = estaPagado(data);
-
-        let style = "h-11 sm:h-12 rounded-xl font-black text-xs transition-all flex flex-col items-center justify-center border shadow-sm leading-none gap-0.5 ";
-        if (isPaid) {
-          style += "bg-red-950/40 border-red-800 text-red-400";
-        } else if (isOccupied) {
-          style += "bg-amber-900/40 border-amber-700 text-amber-300";
-        } else {
-          style += "bg-brand-card border-gray-800 text-gray-500";
-        }
-
-        const nombreCorto = (isOccupied && typeof data === 'object' && data.nombre)
-          ? data.nombre.split(' ')[0].slice(0, 5)
-          : '';
-
-        gridHtml += `<div class="${style}"><span>${numStr}</span>${nombreCorto ? `<span class="ticket-name">${nombreCorto}</span>` : ''}</div>`;
-      }
-      grid.innerHTML = gridHtml;
-
-      // -------- Tabla de compradores (solo los números ocupados) --------
-      const body = document.getElementById('talonario-detalle-body');
-      const entries = Object.entries(numeros).sort((a, b) => a[0].localeCompare(b[0]));
-
-      if (entries.length === 0) {
-        body.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-500 text-xs">Sin registros.</td></tr>`;
-      } else {
-        body.innerHTML = entries.map(([num, data]) => {
-          const nombre = (typeof data === 'object') ? (data.nombre || 'Bloqueado por Admin') : 'Bloqueado por Admin';
-          const telefono = (typeof data === 'object') ? (data.telefono || 'N/A') : 'N/A';
-          const pagado = estaPagado(data);
-          return `
-            <tr class="border-b border-gray-800/60">
-              <td class="p-2.5 font-black text-amber-400">${num}</td>
-              <td class="p-2.5 text-white">${nombre}</td>
-              <td class="p-2.5 text-gray-400">${telefono}</td>
-              <td class="p-2.5">
-                <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-950/40 border-red-800 text-red-300' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">
-                  ${pagado ? 'PAGADO' : 'RESERVADO'}
-                </span>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      document.getElementById('modal-talonario-detalle').classList.remove('hidden');
-      document.getElementById('modal-talonario-detalle').classList.add('flex');
-    }
-
-    function cerrarTalonarioDetalle() {
-      document.getElementById('modal-talonario-detalle').classList.add('hidden');
-      document.getElementById('modal-talonario-detalle').classList.remove('flex');
-    }
-
-    function eliminarTalonario(key) {
-      if (!confirm('¿Borrar este talonario guardado? Esta acción no se puede deshacer.')) return;
-      talonariosRef.child(key).remove();
-    }
-
-    let resetSignalListo = false;
-    let resetSignalInicial = null;
-
-    // Escuchador de la señal de "nueva rifa": si cambia después de cargar la página,
-    // avisamos a todos los visitantes conectados que recarguen.
-    resetSignalRef.on('value', (snapshot) => {
-      const val = snapshot.val();
-      if (!resetSignalListo) {
-        resetSignalListo = true;
-        resetSignalInicial = val;
-        return;
-      }
-      if (val !== resetSignalInicial) {
-        mostrarAvisoNuevaRifa();
-      }
-    });
-
-    function mostrarAvisoNuevaRifa() {
-      if (document.getElementById('aviso-nueva-rifa')) return;
-      const aviso = document.createElement('div');
-      aviso.id = 'aviso-nueva-rifa';
-      aviso.className = 'fixed top-0 left-0 right-0 bg-amber-500 text-black text-xs sm:text-sm font-bold px-4 py-3 z-[60] flex flex-col sm:flex-row items-center justify-center gap-2 shadow-2xl';
-      aviso.innerHTML = `
-        <span><i class="fa-solid fa-triangle-exclamation"></i> ¡Hay un nuevo sorteo! Recarga la página para ver los números y premios actualizados.</span>
-        <button onclick="location.reload()" class="bg-black text-amber-400 font-black px-4 py-1.5 rounded-lg hover:bg-gray-900 transition-all">Recargar ahora</button>
-      `;
-      document.body.prepend(aviso);
-    }
-
-    // Escuchador en tiempo real de números ocupados/reservados
-    ocupadosRef.on('value', (snapshot) => {
-      ocultarAvisoSinConexion();
-      occupiedNumbers = snapshot.val() || {};
-      renderGrid();
-      if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) {
-        renderAdminTable();
-      }
-    }, (error) => {
-      mostrarAvisoSinConexion();
-    });
-
-    // Escuchador en tiempo real de la configuración de la rifa
-    configRef.on('value', (snapshot) => {
-      const val = snapshot.val();
-      if (val) {
-        raffleConfig = Object.assign({}, raffleConfig, val);
-        if (!Array.isArray(raffleConfig.premios) || raffleConfig.premios.length === 0) {
-          raffleConfig.premios = [];
-        }
-      }
-      renderHero();
-      renderLineales();
-          actualizarBannerLineales();
-      if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) {
-        cargarConfigEnFormulario();
-      }
-    });
-
-    function mostrarAvisoSinConexion() {
-      if (document.getElementById('aviso-sin-conexion')) return;
-      const aviso = document.createElement('div');
-      aviso.id = 'aviso-sin-conexion';
-      aviso.className = 'fixed top-16 left-1/2 -translate-x-1/2 bg-red-600 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-lg z-50 flex items-center gap-2';
-      aviso.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Sin conexión con el servidor. Por favor recarga la página.';
-      document.body.appendChild(aviso);
-    }
-
-    function ocultarAvisoSinConexion() {
-      const aviso = document.getElementById('aviso-sin-conexion');
-      if (aviso) aviso.remove();
-    }
-
-    function estaPagado(data) {
-      // Antes: !!(data && typeof data === 'object' && data.pagado)
-      // Ese "!!" convierte a "true" CUALQUIER valor que no esté vacío,
-      // incluyendo el texto "false" (string), el número 0 guardado como texto, etc.
-      // Ahora exigimos que sea EXACTAMENTE el booleano true.
-      return !!(data && typeof data === 'object' && data.pagado === true);
-    }
+    function estaPagado(data) { return !!(data && typeof data === 'object' && data.pagado === true); }
 
     function updateStats() {
       const keys = Object.keys(occupiedNumbers);
@@ -1718,77 +372,38 @@ function guardarConfigLineales() {
       document.getElementById('stat-libres').innerText = 100 - keys.length;
     }
 
-    // -------- HERO / CONFIG DE LA RIFA --------
     function renderHero() {
       document.getElementById('config-titulo').innerText = raffleConfig.titulo || 'PYA Rifas';
-      const fechaEl = document.getElementById('config-fecha');
-      const ubicacionEl = document.getElementById('config-ubicacion');
-      const precioEl = document.getElementById('config-precio');
-
-      fechaEl.innerHTML = raffleConfig.fecha
-        ? `<i class="fa-regular fa-calendar text-amber-400"></i> ${raffleConfig.fecha}`
-        : '';
-      ubicacionEl.innerHTML = raffleConfig.ubicacion
-        ? `<i class="fa-solid fa-location-dot text-amber-400"></i> ${raffleConfig.ubicacion}`
-        : '';
-      precioEl.innerHTML = raffleConfig.precio
-        ? `<i class="fa-solid fa-ticket text-amber-400"></i> ${raffleConfig.precio} / boleta`
-        : '';
-
+      document.getElementById('config-fecha').innerHTML = raffleConfig.fecha ? `<i class="fa-regular fa-calendar text-amber-400"></i> ${raffleConfig.fecha}` : '';
+      document.getElementById('config-ubicacion').innerHTML = raffleConfig.ubicacion ? `<i class="fa-solid fa-location-dot text-amber-400"></i> ${raffleConfig.ubicacion}` : '';
+      document.getElementById('config-precio').innerHTML = raffleConfig.precio ? `<i class="fa-solid fa-ticket text-amber-400"></i> ${raffleConfig.precio} / boleta` : '';
       const img = document.getElementById('config-banner-img');
       const fallback = document.getElementById('config-banner-fallback');
-      if (raffleConfig.banner) {
-        img.src = raffleConfig.banner;
-        img.classList.remove('hidden');
-        fallback.classList.add('hidden');
-      } else {
-        img.classList.add('hidden');
-        fallback.classList.remove('hidden');
-      }
-
+      if (raffleConfig.banner) { img.src = raffleConfig.banner; img.classList.remove('hidden'); fallback.classList.add('hidden'); } 
+      else { img.classList.add('hidden'); fallback.classList.remove('hidden'); }
       const premiosWrap = document.getElementById('config-premios');
       const premios = raffleConfig.premios || [];
-      premiosWrap.innerHTML = premios.map((p, i) => `
-        <div class="bg-black/40 border border-amber-500/20 rounded-xl p-2.5 md:p-3 text-center">
-          <p class="text-[9px] md:text-[10px] text-gray-400 uppercase font-semibold">${i + 1}° ${p.label || ''}</p>
-          <p class="text-sm md:text-base font-black text-amber-400">$${p.valor || '0'}</p>
-        </div>
-      `).join('');
+      premiosWrap.innerHTML = premios.map((p, i) => `<div class="bg-black/40 border border-amber-500/20 rounded-xl p-2.5 md:p-3 text-center"><p class="text-[9px] md:text-[10px] text-gray-400 uppercase font-semibold">${i + 1}° ${p.label || ''}</p><p class="text-sm md:text-base font-black text-amber-400">$${p.valor || '0'}</p></div>`).join('');
     }
 
-    // -------- GRID DE NÚMEROS --------
     function renderGrid() {
       const grid = document.getElementById('grid-numeros');
       grid.innerHTML = '';
-
       for (let i = 0; i < 100; i++) {
         const numStr = i.toString().padStart(2, '0');
         const data = occupiedNumbers[numStr];
         const isOccupied = !!data;
         const isPaid = estaPagado(data);
         const isSelected = selectedNumbers.includes(numStr);
-
         const btn = document.createElement('button');
         btn.disabled = isOccupied;
-
         let baseStyle = "h-11 sm:h-12 md:h-14 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all flex flex-col items-center justify-center border shadow-sm leading-none gap-0.5 ";
-
-        if (isPaid) {
-          baseStyle += "bg-red-950/30 border-red-900/50 text-red-500 cursor-not-allowed opacity-60";
-        } else if (isOccupied) {
-          baseStyle += "bg-amber-900/30 border-amber-700/50 text-amber-400 cursor-not-allowed opacity-75";
-        } else if (isSelected) {
-          baseStyle += "bg-gradient-to-tr from-amber-500 to-amber-400 border-amber-300 text-black shadow-lg shadow-amber-500/30 scale-105 z-10";
-        } else {
-          baseStyle += "bg-brand-card border-gray-800 hover:border-amber-500/50 hover:text-amber-400 text-gray-300 hover:scale-105";
-        }
-
+        if (isPaid) baseStyle += "bg-red-950/30 border-red-900/50 text-red-500 cursor-not-allowed opacity-60";
+        else if (isOccupied) baseStyle += "bg-amber-900/30 border-amber-700/50 text-amber-400 cursor-not-allowed opacity-75";
+        else if (isSelected) baseStyle += "bg-gradient-to-tr from-amber-500 to-amber-400 border-amber-300 text-black shadow-lg shadow-amber-500/30 scale-105 z-10";
+        else baseStyle += "bg-brand-card border-gray-800 hover:border-amber-500/50 hover:text-amber-400 text-gray-300 hover:scale-105";
         btn.className = baseStyle;
-
-        const nombreCorto = (isOccupied && typeof data === 'object' && data.nombre)
-          ? data.nombre.split(' ')[0].slice(0, 5)
-          : '';
-
+        const nombreCorto = (isOccupied && typeof data === 'object' && data.nombre) ? data.nombre.split(' ')[0].slice(0, 5) : '';
         btn.innerHTML = `<span>${numStr}</span>${nombreCorto ? `<span class="ticket-name">${nombreCorto}</span>` : ''}`;
         btn.onclick = () => toggleNumberSelection(numStr);
         grid.appendChild(btn);
@@ -1797,11 +412,8 @@ function guardarConfigLineales() {
     }
 
     function toggleNumberSelection(numStr) {
-      if (selectedNumbers.includes(numStr)) {
-        selectedNumbers = selectedNumbers.filter(n => n !== numStr);
-      } else {
-        selectedNumbers.push(numStr);
-      }
+      if (selectedNumbers.includes(numStr)) selectedNumbers = selectedNumbers.filter(n => n !== numStr);
+      else selectedNumbers.push(numStr);
       updateCartBar();
       renderGrid();
     }
@@ -1809,12 +421,9 @@ function guardarConfigLineales() {
     function updateCartBar() {
       const cartBar = document.getElementById('cart-bar');
       const list = document.getElementById('selected-numbers-list');
-
       if (selectedNumbers.length > 0) {
         cartBar.classList.remove('translate-y-full');
-        list.innerHTML = selectedNumbers.map(n =>
-          `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold px-2 py-0.5 rounded-lg text-[10px] md:text-xs">${n}</span>`
-        ).join('');
+        list.innerHTML = selectedNumbers.map(n => `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold px-2 py-0.5 rounded-lg text-[10px] md:text-xs">${n}</span>`).join('');
       } else {
         cartBar.classList.add('translate-y-full');
       }
@@ -1824,7 +433,6 @@ function guardarConfigLineales() {
       document.getElementById('user-numbers').value = selectedNumbers.join(', ');
       document.getElementById('user-name').value = '';
       document.getElementById('user-phone').value = '';
-
       document.getElementById('modal-checkout').classList.remove('hidden');
       document.getElementById('modal-checkout').classList.add('flex');
     }
@@ -1836,71 +444,48 @@ function guardarConfigLineales() {
 
     async function handleReserva(e) {
       e.preventDefault();
-
       const name = document.getElementById('user-name').value.trim();
       const phone = document.getElementById('user-phone').value.trim();
-
       const submitBtn = e.target.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<span>Verificando...</span>';
-
       let current;
       try {
         const snapshot = await ocupadosRef.once('value');
         current = snapshot.val() || {};
       } catch (err) {
-        alert('No se pudo conectar con la base de datos. Revisa tu internet e inténtalo de nuevo.');
+        alert('No se pudo conectar con la base de datos.');
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
         return;
       }
-
       const conflictos = selectedNumbers.filter(n => current[n]);
-
       if (conflictos.length > 0) {
         occupiedNumbers = current;
         selectedNumbers = selectedNumbers.filter(n => !conflictos.includes(n));
         renderGrid();
         updateCartBar();
         closeCheckoutModal();
-        alert(`¡Justo a tiempo! Los siguientes números ya fueron apartados por otra persona hace un instante: ${conflictos.join(', ')}.\n\nLos quitamos de tu selección. Por favor elige otros números.`);
+        alert(`¡Justo a tiempo! Los siguientes números ya fueron apartados: ${conflictos.join(', ')}.`);
         return;
       }
-
-      const confirmar = confirm(`¿Seguro son todos los números que escogerás? (${selectedNumbers.join(', ')})\nPor favor, verifica tus datos antes de continuar.`);
-      if (!confirmar) {
+      if (!confirm(`¿Seguro son todos los números? (${selectedNumbers.join(', ')})`)) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
         return;
       }
-
       const updates = {};
-      selectedNumbers.forEach(num => {
-        updates[num] = {
-          nombre: name,
-          telefono: phone,
-          fecha: new Date().toLocaleDateString(),
-          pagado: false
-        };
-      });
-
+      selectedNumbers.forEach(num => { updates[num] = { nombre: name, telefono: phone, fecha: new Date().toLocaleDateString(), pagado: false }; });
       try {
         await ocupadosRef.update(updates);
       } catch (err) {
-        alert('Ocurrió un error al guardar tu reserva. Inténtalo de nuevo.');
+        alert('Ocurrió un error al guardar tu reserva.');
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
         return;
       }
-
-      const mensaje = `Hola PYA, quiero hacer la reserva de mis boletas:%0A%0A` +
-        `👤 *Nombre:* ${encodeURIComponent(name)}%0A` +
-        `📱 *Teléfono:* ${encodeURIComponent(phone)}%0A` +
-        `🎟️ *Boleta(s):* ${selectedNumbers.join(', ')}%0A%0A` +
-        `Quedo atento a las instrucciones para enviar el comprobante de pago.`;
-
+      const mensaje = `Hola PYA, quiero hacer la reserva de mis boletas:%0A%0A👤 *Nombre:* ${encodeURIComponent(name)}%0A📱 *Teléfono:* ${encodeURIComponent(phone)}%0A🎟️ *Boleta(s):* ${selectedNumbers.join(', ')}%0A%0AQuedo atento a las instrucciones para enviar el comprobante de pago.`;
       window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${mensaje}`, '_blank');
-
       selectedNumbers = [];
       closeCheckoutModal();
       updateCartBar();
@@ -1912,22 +497,15 @@ function guardarConfigLineales() {
       document.getElementById('modal-admin-login').classList.remove('hidden');
       document.getElementById('modal-admin-login').classList.add('flex');
     }
-
     function closeAdminModal() {
       document.getElementById('modal-admin-login').classList.add('hidden');
       document.getElementById('modal-admin-login').classList.remove('flex');
     }
-
     function handleAdminLogin(e) {
       e.preventDefault();
-
       const user = document.getElementById('admin-user').value.trim();
       const pass = document.getElementById('admin-pass').value.trim();
-
-      const userB64 = btoa(user);
-      const passB64 = btoa(pass);
-
-      if (userB64 === ADMIN_USER_B64 && passB64 === ADMIN_PASS_B64) {
+      if (btoa(user) === ADMIN_USER_B64 && btoa(pass) === ADMIN_PASS_B64) {
         document.getElementById('admin-user').value = '';
         document.getElementById('admin-pass').value = '';
         closeAdminModal();
@@ -1936,15 +514,12 @@ function guardarConfigLineales() {
         alert('Credenciales incorrectas');
       }
     }
-
     function openAdminDashboard() {
       document.getElementById('modal-admin-dashboard').classList.remove('hidden');
       document.getElementById('modal-admin-dashboard').classList.add('flex');
       renderAdminTable();
-      renderAdminTableLineales();
       cargarConfigEnFormulario();
     }
-
     function closeAdminDashboard() {
       document.getElementById('modal-admin-dashboard').classList.add('hidden');
       document.getElementById('modal-admin-dashboard').classList.remove('flex');
@@ -1953,63 +528,41 @@ function guardarConfigLineales() {
     function renderAdminTable() {
       const tbody = document.getElementById('admin-table-body');
       tbody.innerHTML = '';
-
       const keys = Object.keys(occupiedNumbers);
       if (keys.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 text-xs">No hay números marcados como reservados o vendidos.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 text-xs">No hay números marcados.</td></tr>`;
         return;
       }
-
       keys.forEach(num => {
         const data = occupiedNumbers[num];
         const cliente = (typeof data === 'object') ? (data.nombre || 'Bloqueado por Admin') : 'Bloqueado por Admin';
         const telefono = (typeof data === 'object') ? (data.telefono || 'N/A') : 'N/A';
         const pagado = estaPagado(data);
-
         const tr = document.createElement('tr');
         tr.className = "border-b border-gray-800/60 hover:bg-gray-900/40";
         tr.innerHTML = `
           <td class="p-3 md:p-4 font-black text-amber-400 text-sm md:text-base">${num}</td>
           <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${cliente}</td>
           <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${telefono}</td>
-          <td class="p-3 md:p-4">
-            <span class="px-2 py-1 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-950/40 border-red-800 text-red-300' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">
-              ${pagado ? 'PAGADO' : 'RESERVADO'}
-            </span>
-          </td>
+          <td class="p-3 md:p-4"><span class="px-2 py-1 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-950/40 border-red-800 text-red-300' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">${pagado ? 'PAGADO' : 'RESERVADO'}</span></td>
           <td class="p-3 md:p-4 flex flex-wrap gap-2">
-            <button onclick="adminTogglePagado('${num}')" class="${pagado ? 'bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border-amber-500/30' : 'bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 border-red-500/30'} border px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
-              ${pagado ? 'Marcar Reservado' : 'Ya Pagó'}
-            </button>
-            <button onclick="adminLiberarNumero('${num}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-black border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
-              Liberar
-            </button>
-          </td>
-        `;
+            <button onclick="adminTogglePagado('${num}')" class="${pagado ? 'bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border-amber-500/30' : 'bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 border-red-500/30'} border px-2.5 py-1 rounded-lg text-xs font-bold transition-all">${pagado ? 'Marcar Reservado' : 'Ya Pagó'}</button>
+            <button onclick="adminLiberarNumero('${num}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-black border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Liberar</button>
+          </td>`;
         tbody.appendChild(tr);
       });
     }
 
     function adminTogglePagado(num) {
       const data = occupiedNumbers[num];
-      const actual = estaPagado(data);
-      ocupadosRef.child(num).update({ pagado: !actual });
+      ocupadosRef.child(num).update({ pagado: !estaPagado(data) });
     }
-
     function adminBloquearNumero() {
       const val = document.getElementById('admin-block-num').value.trim();
       if (!val) return;
-
-      const formatted = val.padStart(2, '0');
-      ocupadosRef.child(formatted).set({
-        nombre: 'Bloqueado Manualmente',
-        telefono: 'N/A',
-        fecha: new Date().toLocaleDateString(),
-        pagado: false
-      });
+      ocupadosRef.child(val.padStart(2, '0')).set({ nombre: 'Bloqueado Manualmente', telefono: 'N/A', fecha: new Date().toLocaleDateString(), pagado: false });
       document.getElementById('admin-block-num').value = '';
     }
-
     function adminLiberarNumero(num) {
       ocupadosRef.child(num).remove();
     }
@@ -2017,99 +570,147 @@ function guardarConfigLineales() {
     function buscarGanador() {
       const input = document.getElementById('admin-winner-num').value.trim();
       if (!input) return;
-
       const numFormatted = input.padStart(2, '0');
       const resContainer = document.getElementById('winner-result');
       resContainer.classList.remove('hidden');
       ultimoGanadorEncontrado = null;
-
       const data = occupiedNumbers[numFormatted];
-
       if (!data) {
         resContainer.className = "p-4 rounded-xl border bg-red-950/40 border-red-800 text-red-300 text-sm space-y-1";
-        resContainer.innerHTML = `
-          <p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> El número ${numFormatted} NO fue vendido / comprado.</p>
-          <p class="text-xs text-red-400">El premio queda vacante o acumula según las políticas del sorteo.</p>
-        `;
+        resContainer.innerHTML = `<p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> El número ${numFormatted} NO fue vendido.</p>`;
         return;
       }
-
       const cliente = (typeof data === 'object') ? (data.nombre || 'Sin nombre asignado') : 'Sin nombre asignado';
       const telefono = (typeof data === 'object') ? (data.telefono || '') : '';
-
       let cleanPhone = telefono.replace(/\D/g, '');
-      if (cleanPhone.length === 10) {
-        cleanPhone = '57' + cleanPhone;
-      }
-
-      const mensajeGanador = `¡Hola ${cliente}! 🎉🥳%0A%0ATenemos excelentes noticias de *PYA SORTEOS*. Tu número *${numFormatted}* ha sido el *GANADOR* del premio mayor. 🏆%0A%0APor favor respóndenos a este mensaje para coordinar la entrega de tu premio.%0A%0A¡Muchas felicidades! 👏`;
-
+      if (cleanPhone.length === 10) cleanPhone = '57' + cleanPhone;
+      const mensajeGanador = `¡Hola ${cliente}! 🎉🥳%0A%0ATenemos excelentes noticias de *PYA SORTEOS*. Tu número *${numFormatted}* ha sido el *GANADOR*. 🏆%0A%0APor favor respóndenos a este mensaje para coordinar la entrega de tu premio.`;
       ultimoGanadorEncontrado = { numero: numFormatted, nombre: cliente, telefono: telefono || '' };
-
       resContainer.className = "p-4 rounded-xl border bg-emerald-950/40 border-emerald-800 text-emerald-200 text-sm space-y-3";
       resContainer.innerHTML = `
-        <div class="flex items-center gap-2 font-bold text-emerald-400">
-          <i class="fa-solid fa-trophy text-amber-400 text-lg"></i>
-          <span>¡NÚMERO GANADOR ENCONTRADO!</span>
-        </div>
+        <div class="flex items-center gap-2 font-bold text-emerald-400"><i class="fa-solid fa-trophy text-amber-400 text-lg"></i><span>¡NÚMERO GANADOR ENCONTRADO!</span></div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs bg-black/40 p-3 rounded-lg border border-emerald-800/50">
           <p><strong class="text-gray-400">Boleta:</strong> <span class="text-amber-400 font-bold text-sm">${numFormatted}</span></p>
           <p><strong class="text-gray-400">Ganador(a):</strong> <span class="text-white font-bold">${cliente}</span></p>
           <p><strong class="text-gray-400">Teléfono:</strong> <span class="text-white font-bold">${telefono || 'N/A'}</span></p>
         </div>
         <div class="flex flex-wrap gap-2">
-          ${cleanPhone ? `
-            <a href="https://wa.me/${cleanPhone}?text=${mensajeGanador}" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/20">
-              <i class="fa-brands fa-whatsapp text-base"></i>
-              <span>Notificar Ganador por WhatsApp</span>
-            </a>
-          ` : `<p class="text-xs text-amber-400 font-semibold">Este número fue bloqueado manualmente y no tiene un teléfono registrado.</p>`}
-          <button onclick="guardarGanadorActual()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all">
-            <i class="fa-solid fa-bookmark"></i>
-            <span>Guardar en Historial</span>
-          </button>
-        </div>
-      `;
+          ${cleanPhone ? `<a href="https://wa.me/${cleanPhone}?text=${mensajeGanador}" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/20"><i class="fa-brands fa-whatsapp text-base"></i><span>Notificar Ganador por WhatsApp</span></a>` : `<p class="text-xs text-amber-400 font-semibold">Sin teléfono registrado.</p>`}
+          <button onclick="guardarGanadorActual()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all"><i class="fa-solid fa-bookmark"></i><span>Guardar en Historial</span></button>
+        </div>`;
     }
 
-    // -------- CONFIGURACIÓN DE LA RIFA (ADMIN) --------
+    function guardarGanadorActual() {
+      if (!ultimoGanadorEncontrado) return;
+      ganadoresRef.push({ sorteo: raffleConfig.titulo || 'Sin título', numero: ultimoGanadorEncontrado.numero, nombre: ultimoGanadorEncontrado.nombre, telefono: ultimoGanadorEncontrado.telefono || '', fecha: new Date().toLocaleDateString() }).then(() => alert('Ganador guardado en el historial.'));
+    }
+    function eliminarGanador(key) {
+      if (!confirm('¿Borrar este registro?')) return;
+      ganadoresRef.child(key).remove();
+    }
+    function renderGanadoresTable(data) {
+      const tbody = document.getElementById('ganadores-table-body');
+      if (!tbody) return;
+      const entries = Object.entries(data).reverse();
+      if (entries.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500 text-xs">Todavía no hay ganadores guardados.</td></tr>`; return; }
+      tbody.innerHTML = entries.map(([key, g]) => `
+        <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
+          <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${g.sorteo || '-'}</td>
+          <td class="p-3 md:p-4 font-black text-amber-400 text-sm">${g.numero || '-'}</td>
+          <td class="p-3 md:p-4 text-white text-xs md:text-sm">${g.nombre || '-'}</td>
+          <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${g.telefono || 'N/A'}</td>
+          <td class="p-3 md:p-4 text-gray-400 text-xs">${g.fecha || '-'}</td>
+          <td class="p-3 md:p-4"><button onclick="eliminarGanador('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Borrar</button></td>
+        </tr>`).join('');
+    }
+
+    function renderTalonariosTable() {
+      const tbody = document.getElementById('talonarios-table-body');
+      if (!tbody) return;
+      const entries = Object.entries(talonariosData).reverse();
+      if (entries.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 text-xs">Todavía no hay talonarios guardados.</td></tr>`; return; }
+      tbody.innerHTML = entries.map(([key, t]) => {
+        const cantidad = t.numeros ? Object.keys(t.numeros).length : 0;
+        return `<tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
+          <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${t.sorteo || '-'}</td>
+          <td class="p-3 md:p-4 text-gray-400 text-xs">${t.fechaGuardado || '-'}</td>
+          <td class="p-3 md:p-4 text-amber-400 font-bold text-sm">${cantidad}</td>
+          <td class="p-3 md:p-4 flex flex-wrap gap-2">
+            <button onclick="verTalonario('${key}')" class="bg-indigo-500/10 hover:bg-indigo-500 text-indigo-300 hover:text-white border border-indigo-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Ver</button>
+            <button onclick="eliminarTalonario('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Borrar</button>
+          </td></tr>`;
+      }).join('');
+    }
+
+    function construirSnapshotTalonario() {
+      return { sorteo: raffleConfig.titulo || 'Sin título', fechaSorteo: raffleConfig.fecha || '', precio: raffleConfig.precio || '', fechaGuardado: new Date().toLocaleString(), numeros: JSON.parse(JSON.stringify(occupiedNumbers)) };
+    }
+    function guardarTalonarioActual() {
+      const keys = Object.keys(occupiedNumbers);
+      if (keys.length === 0) { alert('No hay números para guardar.'); return; }
+      if (!confirm(`¿Guardar el talonario actual con ${keys.length} boleta(s)?`)) return;
+      talonariosRef.push(construirSnapshotTalonario()).then(() => alert('Talonario guardado correctamente.'));
+    }
+    function verTalonario(key) {
+      const t = talonariosData[key];
+      if (!t) return;
+      document.getElementById('talonario-detalle-titulo').innerText = `${t.sorteo || 'Sorteo'} — ${t.fechaGuardado || ''}`;
+      const numeros = t.numeros || {};
+      const grid = document.getElementById('talonario-detalle-grid');
+      let gridHtml = '';
+      for (let i = 0; i < 100; i++) {
+        const numStr = i.toString().padStart(2, '0');
+        const data = numeros[numStr];
+        const isOccupied = !!data;
+        const isPaid = estaPagado(data);
+        let style = "h-11 sm:h-12 rounded-xl font-black text-xs transition-all flex flex-col items-center justify-center border shadow-sm leading-none gap-0.5 ";
+        if (isPaid) style += "bg-red-950/40 border-red-800 text-red-400";
+        else if (isOccupied) style += "bg-amber-900/40 border-amber-700 text-amber-300";
+        else style += "bg-brand-card border-gray-800 text-gray-500";
+        const nombreCorto = (isOccupied && typeof data === 'object' && data.nombre) ? data.nombre.split(' ')[0].slice(0, 5) : '';
+        gridHtml += `<div class="${style}"><span>${numStr}</span>${nombreCorto ? `<span class="ticket-name">${nombreCorto}</span>` : ''}</div>`;
+      }
+      grid.innerHTML = gridHtml;
+      const body = document.getElementById('talonario-detalle-body');
+      const entries = Object.entries(numeros).sort((a, b) => a[0].localeCompare(b[0]));
+      if (entries.length === 0) { body.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-500 text-xs">Sin registros.</td></tr>`; } 
+      else {
+        body.innerHTML = entries.map(([num, data]) => {
+          const nombre = (typeof data === 'object') ? (data.nombre || 'Bloqueado por Admin') : 'Bloqueado por Admin';
+          const telefono = (typeof data === 'object') ? (data.telefono || 'N/A') : 'N/A';
+          const pagado = estaPagado(data);
+          return `<tr class="border-b border-gray-800/60">
+            <td class="p-2.5 font-black text-amber-400">${num}</td>
+            <td class="p-2.5 text-white">${nombre}</td>
+            <td class="p-2.5 text-gray-400">${telefono}</td>
+            <td class="p-2.5"><span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-950/40 border-red-800 text-red-300' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">${pagado ? 'PAGADO' : 'RESERVADO'}</span></td></tr>`;
+        }).join('');
+      }
+      document.getElementById('modal-talonario-detalle').classList.remove('hidden');
+      document.getElementById('modal-talonario-detalle').classList.add('flex');
+    }
+    function cerrarTalonarioDetalle() {
+      document.getElementById('modal-talonario-detalle').classList.add('hidden');
+      document.getElementById('modal-talonario-detalle').classList.remove('flex');
+    }
+    function eliminarTalonario(key) {
+      if (!confirm('¿Borrar este talonario guardado?')) return;
+      talonariosRef.child(key).remove();
+    }
+
     function cargarConfigEnFormulario() {
       document.getElementById('cfg-titulo').value = raffleConfig.titulo || '';
       document.getElementById('cfg-precio').value = raffleConfig.precio || '';
       document.getElementById('cfg-fecha').value = raffleConfig.fecha || '';
       document.getElementById('cfg-ubicacion').value = raffleConfig.ubicacion || '';
-      document.getElementById('cfg-lineales-activo').checked = !!raffleConfig.linealesActivo;
-      document.getElementById('cfg-lineales-precio').value = raffleConfig.linealesPrecio || '';
-      const linealesBannerVal = raffleConfig.linealesBanner || '';
-      document.getElementById('cfg-lineales-banner').value = linealesBannerVal;
-      document.getElementById('cfg-lineales-banner-file').value = '';
-      document.getElementById('cfg-lineales-banner-status').innerText = 'Si no subes nada, se muestra un ícono animado por defecto. Los GIF pesados (más de ~350KB) no se aceptan para que la página cargue rápido.';
-      const linealesPreviewImg = document.getElementById('cfg-lineales-banner-preview');
-      const linealesPreviewEmpty = document.getElementById('cfg-lineales-banner-preview-empty');
-      if (linealesBannerVal) {
-        linealesPreviewImg.src = linealesBannerVal;
-        linealesPreviewImg.classList.remove('hidden');
-        linealesPreviewEmpty.classList.add('hidden');
-      } else {
-        linealesPreviewImg.classList.add('hidden');
-        linealesPreviewEmpty.classList.remove('hidden');
-      }
       const bannerVal = raffleConfig.banner || '';
       document.getElementById('cfg-banner').value = bannerVal;
       document.getElementById('cfg-banner-file').value = '';
-      document.getElementById('cfg-banner-status').innerText = 'Si no subes nada, se muestra un ícono animado por defecto 🎁. Los GIF pesados (más de ~350KB) no se aceptan para que la página cargue rápido.';
       const previewImg = document.getElementById('cfg-banner-preview');
       const previewEmpty = document.getElementById('cfg-banner-preview-empty');
-      if (bannerVal) {
-        previewImg.src = bannerVal;
-        previewImg.classList.remove('hidden');
-        previewEmpty.classList.add('hidden');
-      } else {
-        previewImg.classList.add('hidden');
-        previewEmpty.classList.remove('hidden');
-      }
+      if (bannerVal) { previewImg.src = bannerVal; previewImg.classList.remove('hidden'); previewEmpty.classList.add('hidden'); } 
+      else { previewImg.classList.add('hidden'); previewEmpty.classList.remove('hidden'); }
       renderPremiosForm();
-      renderLinealesNumerosForm();
     }
 
     function renderPremiosForm() {
@@ -2119,79 +720,22 @@ function guardarConfigLineales() {
         <div class="flex gap-2 items-center">
           <input type="text" value="${(p.label || '').replace(/"/g, '&quot;')}" placeholder="Ej: Dos últimas" data-idx="${i}" data-field="label" oninput="onPremioInput(event)" class="flex-1 bg-black/60 border border-gray-700/80 rounded-lg p-2 text-xs text-white">
           <input type="text" value="${(p.valor || '').replace(/"/g, '&quot;')}" placeholder="Ej: 50.000" data-idx="${i}" data-field="valor" oninput="onPremioInput(event)" class="w-28 bg-black/60 border border-gray-700/80 rounded-lg p-2 text-xs text-white">
-          <button type="button" onclick="eliminarFilaPremio(${i})" class="text-red-400 hover:text-red-300 px-2">
-            <i class="fa-solid fa-trash text-xs"></i>
-          </button>
-        </div>
-      `).join('');
+          <button type="button" onclick="eliminarFilaPremio(${i})" class="text-red-400 hover:text-red-300 px-2"><i class="fa-solid fa-trash text-xs"></i></button>
+        </div>`).join('');
     }
-
     function onPremioInput(e) {
       const idx = parseInt(e.target.dataset.idx, 10);
       const field = e.target.dataset.field;
       raffleConfig.premios[idx][field] = e.target.value;
     }
-
     function agregarFilaPremio() {
       raffleConfig.premios = raffleConfig.premios || [];
       raffleConfig.premios.push({ label: '', valor: '' });
       renderPremiosForm();
     }
-
     function eliminarFilaPremio(i) {
       raffleConfig.premios.splice(i, 1);
       renderPremiosForm();
-    }
-
-    // -------- ADMIN: EDITOR DE NÚMEROS DE CADA FILA (LINEALES) --------
-    function getFilaNumeros(idx) {
-      const custom = raffleConfig.linealesNumeros;
-      if (custom && custom[idx] && custom[idx].length === 4) return custom[idx];
-      return LINEALES_FILAS[idx];
-    }
-
-    function renderLinealesNumerosForm() {
-      const wrap = document.getElementById('cfg-lineales-numeros');
-      if (!wrap) return;
-      wrap.innerHTML = LINEALES_FILAS.map((_, idx) => {
-        const nums = getFilaNumeros(idx);
-        const inputs = nums.map((val, col) => `
-          <input type="text" maxlength="2" inputmode="numeric" value="${val}" data-fila="${idx}" data-col="${col}" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-12 text-center bg-black/60 border border-gray-700/80 rounded-lg p-1.5 text-xs text-white">
-        `).join('');
-        return `
-          <div class="flex items-center gap-2">
-            <span class="w-14 shrink-0 text-[10px] font-bold text-gray-400">Fila ${idx + 1}</span>
-            <div class="flex gap-1.5">${inputs}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function guardarLinealesNumeros() {
-      const wrap = document.getElementById('cfg-lineales-numeros');
-      const inputs = wrap.querySelectorAll('input');
-      const nuevo = LINEALES_FILAS.map(() => ['', '', '', '']);
-
-      inputs.forEach((inp) => {
-        const fila = parseInt(inp.dataset.fila, 10);
-        const col = parseInt(inp.dataset.col, 10);
-        let val = inp.value.trim();
-        if (val === '') val = '00';
-        nuevo[fila][col] = val.padStart(2, '0');
-      });
-
-      const nuevaConfig = Object.assign({}, raffleConfig, { linealesNumeros: nuevo });
-      configRef.set(nuevaConfig).then(() => {
-        alert('Números de Sorteo Lineales guardados. Ya se actualizaron para todos los visitantes.');
-      }).catch(() => {
-        alert('No se pudieron guardar los números. Revisa tu conexión.');
-      });
-    }
-
-    function restaurarLinealesNumerosPorDefecto() {
-      if (!confirm('¿Restaurar los números originales (00 a 99 en orden) para las 25 filas?')) return;
-      raffleConfig.linealesNumeros = null;
-      renderLinealesNumerosForm();
     }
 
     function setBannerValue(dataUrl) {
@@ -2202,38 +746,24 @@ function guardarConfigLineales() {
       preview.classList.remove('hidden');
       empty.classList.add('hidden');
     }
-
     function quitarBanner() {
       document.getElementById('cfg-banner').value = '';
       document.getElementById('cfg-banner-file').value = '';
       document.getElementById('cfg-banner-preview').classList.add('hidden');
       document.getElementById('cfg-banner-preview-empty').classList.remove('hidden');
-      document.getElementById('cfg-banner-status').innerText = 'Se quitará al guardar la configuración.';
     }
-
     function handleBannerFile(e) {
       const file = e.target.files[0];
       if (!file) return;
       const statusEl = document.getElementById('cfg-banner-status');
       statusEl.innerText = 'Procesando imagen...';
-
-      // Los GIF no se pueden comprimir sin perder la animación: se validan por peso.
       if (file.type === 'image/gif') {
-        if (file.size > 350 * 1024) {
-          statusEl.innerText = 'Ese GIF pesa mucho (máx. ~350KB). Elige uno más liviano para que cargue rápido en el celular de todos.';
-          e.target.value = '';
-          return;
-        }
+        if (file.size > 350 * 1024) { statusEl.innerText = 'Ese GIF pesa mucho (máx. ~350KB).'; e.target.value = ''; return; }
         const reader = new FileReader();
-        reader.onload = (ev) => {
-          setBannerValue(ev.target.result);
-          statusEl.innerText = 'GIF listo. No olvides pulsar "Guardar Configuración".';
-        };
+        reader.onload = (ev) => { setBannerValue(ev.target.result); statusEl.innerText = 'GIF listo.'; };
         reader.readAsDataURL(file);
         return;
       }
-
-      // Fotos normales: se redimensionan y comprimen en el navegador antes de guardarlas.
       const reader = new FileReader();
       reader.onload = (ev) => {
         const img = new Image();
@@ -2243,12 +773,10 @@ function guardarConfigLineales() {
           if (w > h && w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
           else if (h >= w && h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
           const canvas = document.createElement('canvas');
-          canvas.width = w;
-          canvas.height = h;
+          canvas.width = w; canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-          setBannerValue(dataUrl);
-          statusEl.innerText = 'Imagen lista. No olvides pulsar "Guardar Configuración".';
+          setBannerValue(canvas.toDataURL('image/jpeg', 0.75));
+          statusEl.innerText = 'Imagen lista.';
         };
         img.src = ev.target.result;
       };
@@ -2256,37 +784,23 @@ function guardarConfigLineales() {
     }
 
     function reiniciarRifa() {
-      const paso1 = confirm('¿Seguro que quieres iniciar un NUEVO SORTEO?\n\nEsto borrará TODOS los números reservados y vendidos actuales. Los 100 números quedarán libres de nuevo.\n\nAntes de borrar, se guardará automáticamente una copia del talonario actual en el historial.\n\nEsta acción NO se puede deshacer.');
+      const paso1 = confirm('¿Seguro que quieres iniciar un NUEVO SORTEO?\n\nEsto borrará TODOS los números reservados y vendidos actuales.\n\nEsta acción NO se puede deshacer.');
       if (!paso1) return;
-
       const paso2 = prompt('Para confirmar, escribe la palabra REINICIAR (en mayúsculas):');
-      if (paso2 !== 'REINICIAR') {
-        alert('No se realizó el reinicio porque el texto no coincidió.');
-        return;
-      }
-
+      if (paso2 !== 'REINICIAR') { alert('No se realizó el reinicio.'); return; }
       const keys = Object.keys(occupiedNumbers);
-      const guardarPrimero = keys.length > 0
-        ? talonariosRef.push(construirSnapshotTalonario())
-        : Promise.resolve();
-
+      const guardarPrimero = keys.length > 0 ? talonariosRef.push(construirSnapshotTalonario()) : Promise.resolve();
       guardarPrimero.then(() => {
         const updates = {};
-        for (let i = 0; i < 100; i++) {
-          updates[i.toString().padStart(2, '0')] = null;
-        }
+        for (let i = 0; i < 100; i++) updates[i.toString().padStart(2, '0')] = null;
         return ocupadosRef.update(updates);
       }).then(() => {
         resetSignalRef.set(Date.now());
-        alert('¡Listo! Se guardó el talonario anterior en el historial (si tenía boletas) y todos los números quedaron libres. Ahora puedes actualizar el título y los premios para la nueva rifa.');
-      }).catch(() => {
-        alert('No se pudo reiniciar. Revisa tu conexión.');
-      });
+        alert('¡Listo! Todos los números quedaron libres.');
+      }).catch(() => alert('No se pudo reiniciar.'));
     }
 
     function guardarConfig() {
-      // Se preservan linealesActivo/linealesPrecio/linealesNumeros tal como están (esa rifa se guarda
-      // aparte, con sus propios botones), para mantener ambos sorteos independientes.
       const nuevaConfig = Object.assign({}, raffleConfig, {
         titulo: document.getElementById('cfg-titulo').value.trim(),
         precio: document.getElementById('cfg-precio').value.trim(),
@@ -2295,18 +809,45 @@ function guardarConfigLineales() {
         banner: document.getElementById('cfg-banner').value.trim(),
         premios: (raffleConfig.premios || []).filter(p => p.label || p.valor)
       });
-
-      configRef.set(nuevaConfig).then(() => {
-        alert('Configuración guardada. Ya se actualizó para todos los visitantes.');
-      }).catch(() => {
-        alert('No se pudo guardar la configuración. Revisa tu conexión.');
-      });
+      configRef.set(nuevaConfig).then(() => alert('Configuración guardada.')).catch(() => alert('No se pudo guardar.'));
     }
+
+    let resetSignalListo = false;
+    let resetSignalInicial = null;
+    resetSignalRef.on('value', (snapshot) => {
+      const val = snapshot.val();
+      if (!resetSignalListo) { resetSignalListo = true; resetSignalInicial = val; return; }
+      if (val !== resetSignalInicial) {
+        if (document.getElementById('aviso-nueva-rifa')) return;
+        const aviso = document.createElement('div');
+        aviso.id = 'aviso-nueva-rifa';
+        aviso.className = 'fixed top-0 left-0 right-0 bg-amber-500 text-black text-xs sm:text-sm font-bold px-4 py-3 z-[60] flex flex-col sm:flex-row items-center justify-center gap-2 shadow-2xl';
+        aviso.innerHTML = `<span><i class="fa-solid fa-triangle-exclamation"></i> ¡Hay un nuevo sorteo! Recarga la página.</span><button onclick="location.reload()" class="bg-black text-amber-400 font-black px-4 py-1.5 rounded-lg hover:bg-gray-900 transition-all">Recargar ahora</button>`;
+        document.body.prepend(aviso);
+      }
+    });
+
+    ocupadosRef.on('value', (snapshot) => {
+      occupiedNumbers = snapshot.val() || {};
+      renderGrid();
+      if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) renderAdminTable();
+    });
+
+    configRef.on('value', (snapshot) => {
+      const val = snapshot.val();
+      if (val) {
+        raffleConfig = Object.assign({}, raffleConfig, val);
+        if (!Array.isArray(raffleConfig.premios) || raffleConfig.premios.length === 0) raffleConfig.premios = [];
+      }
+      renderHero();
+      if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) cargarConfigEnFormulario();
+    });
+
+    ganadoresRef.on('value', (snapshot) => { renderGanadoresTable(snapshot.val() || {}); });
+    talonariosRef.on('value', (snapshot) => { talonariosData = snapshot.val() || {}; renderTalonariosTable(); });
 
     renderHero();
     renderGrid();
-    renderLineales();
-          actualizarBannerLineales();
   </script>
 </body>
 </html>
