@@ -177,6 +177,17 @@
     </section>
     </div>
 
+    <!-- MEDIOS DE PAGO -->
+    <section class="bg-brand-card/50 border border-amber-500/20 rounded-xl p-3.5 md:p-4 text-center space-y-1">
+      <p class="text-amber-400 font-black text-xs md:text-sm tracking-wide">MEDIOS DE PAGO 💰</p>
+      <p class="text-xs md:text-sm text-gray-200 font-semibold">
+        NEQUI: <span class="text-white font-black">3235532989</span>
+        <span class="text-gray-600 mx-1">|</span>
+        DAVIPLATA: <span class="text-white font-black">3235532989</span>
+      </p>
+      <p class="text-[10px] md:text-[11px] text-gray-500">Comprobantes al interno, gracias.</p>
+    </section>
+
     <section class="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-xs text-gray-400 bg-brand-card/50 p-3 md:p-4 rounded-xl border border-gray-800/60">
       <div class="flex items-center gap-2">
         <span class="w-3.5 h-3.5 rounded-md bg-brand-card border border-gray-700"></span>
@@ -198,6 +209,117 @@
 
     <section>
       <div id="grid-numeros" class="grid grid-cols-[repeat(auto-fill,minmax(55px,1fr))] sm:grid-cols-10 gap-2 md:gap-3.5"></div>
+    </section>
+
+    <!-- SORTEO LINEALES (25 filas x 4 números) - RIFA INDEPENDIENTE, activable/desactivable desde admin -->
+    <section id="sorteo-lineales-section" class="hidden space-y-6 md:space-y-10">
+
+      <!-- HERO del Sorteo Lineales, mismo estilo que el hero del sorteo principal -->
+      <div class="glow-border-wrap rounded-2xl md:rounded-3xl">
+        <div class="absolute inset-[4px] rounded-2xl md:rounded-3xl bg-brand-bg"></div>
+        <div class="relative z-10 rounded-2xl md:rounded-3xl p-5 md:p-10 border border-amber-500/30 glassmorphism overflow-hidden glow-gold">
+          <div class="absolute -top-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
+
+            <div class="flex flex-col sm:flex-row items-center gap-4 md:gap-6 w-full md:w-auto">
+              <div class="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border border-amber-500/30 shrink-0 bg-black/40 flex items-center justify-center">
+                <img id="lineales-banner-img" src="" class="w-full h-full object-cover hidden">
+                <div id="lineales-banner-fallback" class="text-amber-400 text-4xl md:text-5xl">
+                  <i class="fa-solid fa-grip-lines"></i>
+                </div>
+              </div>
+
+              <div class="space-y-2 md:space-y-3 text-center sm:text-left max-w-xl">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] md:text-xs font-bold bg-amber-500/10 border border-amber-500/30 text-amber-400 badge-flash">
+                  <i class="fa-solid fa-trophy"></i> Sorteo Lineales Activo
+                </span>
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white leading-tight">
+                  Sorteo Lineales
+                </h2>
+                <div class="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-1 text-[11px] md:text-xs text-gray-400">
+                  <span class="flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-amber-400"></i> 25 filas de 4 números</span>
+                  <span id="lineales-precio-hero" class="hidden items-center gap-1.5 font-bold text-amber-300"><i class="fa-solid fa-ticket text-amber-400"></i></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-black/40 border border-gray-800 rounded-2xl p-4 md:p-5 w-full md:w-64 text-center space-y-2 md:space-y-3">
+              <span class="text-[10px] md:text-xs text-gray-400 uppercase font-semibold">Estado del Sorteo</span>
+              <div class="flex justify-around items-center pt-1">
+                <div>
+                  <p id="lineales-stat-libres" class="text-lg md:text-xl font-black text-gray-200">25</p>
+                  <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Libres</p>
+                </div>
+                <div class="w-px h-8 bg-gray-800"></div>
+                <div>
+                  <p id="lineales-stat-reservados" class="text-lg md:text-xl font-black text-amber-400">0</p>
+                  <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Reservados</p>
+                </div>
+                <div class="w-px h-8 bg-gray-800"></div>
+                <div>
+                  <p id="lineales-stat-vendidos" class="text-lg md:text-xl font-black text-red-400">0</p>
+                  <p class="text-[9px] md:text-[10px] text-gray-400 uppercase">Vendidos</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEDIOS DE PAGO (Sorteo Lineales) -->
+      <div class="bg-brand-card/50 border border-amber-500/20 rounded-xl p-3.5 md:p-4 text-center space-y-1">
+        <p class="text-amber-400 font-black text-xs md:text-sm tracking-wide">MEDIOS DE PAGO 💰</p>
+        <p class="text-xs md:text-sm text-gray-200 font-semibold">
+          NEQUI: <span class="text-white font-black">3235532989</span>
+          <span class="text-gray-600 mx-1">|</span>
+          DAVIPLATA: <span class="text-white font-black">3235532989</span>
+        </p>
+        <p class="text-[10px] md:text-[11px] text-gray-500">Comprobantes al interno, gracias.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-xs text-gray-400 bg-brand-card/50 p-3 md:p-4 rounded-xl border border-gray-800/60">
+        <div class="flex items-center gap-2">
+          <span class="w-3.5 h-3.5 rounded-md bg-brand-card border border-gray-700"></span>
+          <span>Disponible</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3.5 h-3.5 rounded-md bg-amber-500 shadow-sm shadow-amber-500"></span>
+          <span class="text-amber-400 font-medium">Seleccionado</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3.5 h-3.5 rounded-md bg-amber-900/50 border border-amber-700"></span>
+          <span class="text-amber-300">Reservado (sin pagar)</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3.5 h-3.5 rounded-md bg-red-950 border border-red-800 opacity-60"></span>
+          <span class="text-red-400">Vendido / Pagado</span>
+        </div>
+      </div>
+
+      <!-- Tarjeta con la grilla de filas -->
+      <div class="glow-border-wrap rounded-2xl md:rounded-3xl">
+        <div class="absolute inset-[4px] rounded-2xl md:rounded-3xl bg-brand-bg"></div>
+        <div class="relative z-10 rounded-2xl md:rounded-3xl p-4 md:p-6 border border-amber-500/30 glassmorphism">
+          <div id="lineales-grid" class="space-y-1.5 md:space-y-2"></div>
+
+          <!-- Resumen de selección / reserva propia del Sorteo Lineales -->
+          <div id="lineales-cart" class="hidden mt-4 md:mt-5 bg-black/40 border border-amber-500/30 rounded-xl p-3.5 md:p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 w-full sm:w-auto">
+              <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm md:text-base shrink-0">
+                <i class="fa-solid fa-ticket"></i>
+              </div>
+              <div>
+                <p class="text-[10px] md:text-xs text-gray-400">Filas seleccionadas:</p>
+                <div id="lineales-selected-list" class="flex flex-wrap gap-1 mt-0.5"></div>
+              </div>
+            </div>
+            <button onclick="openCheckoutModalLineales()" class="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-black font-extrabold px-6 py-3 rounded-xl shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 text-sm">
+              <i class="fa-brands fa-whatsapp text-lg"></i>
+              <span>Apartar Filas por WhatsApp</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -248,6 +370,42 @@
 
         <div class="flex gap-3 pt-2 md:pt-4">
           <button type="button" onclick="closeCheckoutModal()" class="w-1/2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold py-3 rounded-xl text-sm transition-all">Cancelar</button>
+          <button type="submit" class="w-1/2 bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2">
+            <span>Continuar</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-checkout-lineales" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-brand-card border border-gray-800 rounded-3xl p-5 md:p-8 max-w-md w-full shadow-2xl relative space-y-5">
+      <div class="flex justify-between items-center border-b border-gray-800 pb-3 md:pb-4">
+        <h3 class="text-lg md:text-xl font-black text-white flex items-center gap-2">
+          <i class="fa-solid fa-clipboard-check text-amber-400"></i> Confirmar Reserva — Sorteo Lineales
+        </h3>
+        <button onclick="closeCheckoutModalLineales()" class="text-gray-500 hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="form-reserva-lineales" onsubmit="handleReservaLineales(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Nombre y Apellido</label>
+          <input type="text" id="user-name-lineales" required autocomplete="off" oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\u00f1\u00d1\s]/g, '')" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Teléfono Celular</label>
+          <input type="tel" id="user-phone-lineales" required autocomplete="off" inputmode="numeric" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors" placeholder="">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Fila(s) Reservada(s)</label>
+          <input type="text" id="user-filas" readonly class="w-full bg-gray-900 border border-gray-800 rounded-xl p-3 text-sm text-amber-400 font-bold" value="">
+        </div>
+
+        <div class="flex gap-3 pt-2 md:pt-4">
+          <button type="button" onclick="closeCheckoutModalLineales()" class="w-1/2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold py-3 rounded-xl text-sm transition-all">Cancelar</button>
           <button type="submit" class="w-1/2 bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2">
             <span>Continuar</span>
             <i class="fa-solid fa-arrow-right"></i>
@@ -351,6 +509,166 @@
           <i class="fa-solid fa-floppy-disk"></i>
           <span>Guardar Configuración</span>
         </button>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SORTEO LINEALES — PANEL 100% INDEPENDIENTE DEL SORTEO PRINCIPAL -->
+      <!-- ============================================================ -->
+      <div class="bg-violet-950/20 border border-violet-700/40 rounded-2xl p-4 md:p-6 space-y-4">
+        <h3 class="text-base md:text-lg font-black text-violet-300 flex items-center gap-2">
+          <i class="fa-solid fa-grip-lines"></i> Sorteo Lineales (Rifa Independiente)
+        </h3>
+        <p class="text-[11px] text-gray-500 leading-relaxed">
+          Esta es una rifa aparte: sus filas, compradores, precio y estado NO se mezclan con el sorteo principal de arriba.
+          Se vende por fila completa (25 filas, cada una con 4 números).
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-black/20 p-3 md:p-4 rounded-xl border border-gray-800/60">
+          <label class="flex items-center gap-2.5 cursor-pointer md:col-span-2">
+            <input type="checkbox" id="cfg-lineales-activo" class="w-4 h-4 accent-violet-500">
+            <span class="text-xs md:text-sm font-semibold text-gray-200">Activar "Sorteo Lineales" en la página pública</span>
+          </label>
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Precio por fila</label>
+            <input type="text" id="cfg-lineales-precio" placeholder="Ej: $ 5.000" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
+          </div>
+          <div class="flex items-end">
+            <button onclick="guardarConfigLineales()" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Guardar Config. Lineales</span>
+            </button>
+          </div>
+          <div class="md:col-span-2 space-y-2">
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Banner Lineales (foto o GIF)</label>
+            <div class="flex items-center gap-3">
+              <div id="cfg-lineales-banner-preview-wrap" class="w-16 h-16 rounded-xl overflow-hidden border border-gray-700 bg-black/40 flex items-center justify-center shrink-0">
+                <img id="cfg-lineales-banner-preview" src="" class="w-full h-full object-cover hidden">
+                <span id="cfg-lineales-banner-preview-empty" class="text-amber-400 text-xl"><i class="fa-solid fa-grip-lines"></i></span>
+              </div>
+              <div class="flex-1 space-y-1.5">
+                <input type="file" id="cfg-lineales-banner-file" accept="image/*" onchange="handleLinealesBannerFile(event)" class="block w-full text-xs text-gray-300 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-violet-600 file:text-white file:text-xs file:font-semibold hover:file:bg-violet-700 cursor-pointer">
+                <button type="button" onclick="quitarBannerLineales()" class="text-[11px] text-red-400 hover:text-red-300 font-semibold">Quitar imagen</button>
+              </div>
+            </div>
+            <input type="hidden" id="cfg-lineales-banner" value="">
+            <p id="cfg-lineales-banner-status" class="text-[10px] text-gray-500">Si no subes nada, se muestra un ícono animado por defecto. Los GIF pesados (más de ~350KB) no se aceptan para que la página cargue rápido.</p>
+          </div>
+        </div>
+
+        <!-- Editor de números de cada fila -->
+        <div class="bg-black/20 p-3 md:p-4 rounded-xl border border-gray-800/60 space-y-2">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <label class="block text-xs font-semibold text-gray-300">Números de cada fila (editable)</label>
+            <div class="flex gap-2">
+              <button type="button" onclick="restaurarLinealesNumerosPorDefecto()" class="text-[11px] font-semibold text-gray-400 hover:text-gray-200">Restaurar por defecto</button>
+              <button type="button" onclick="guardarLinealesNumeros()" class="bg-violet-600 hover:bg-violet-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition-all">Guardar Números</button>
+            </div>
+          </div>
+          <p class="text-[10px] text-gray-500">Cada fila tiene 4 números de 2 dígitos. Cámbialos para que coincidan con tu talonario físico.</p>
+          <div id="cfg-lineales-numeros" class="grid grid-cols-1 gap-1.5 max-h-80 overflow-y-auto pr-1"></div>
+        </div>
+
+        <!-- Talonario de compradores del Sorteo Lineales -->
+        <div class="bg-emerald-950/20 border border-emerald-800/40 rounded-2xl p-3.5 md:p-4 space-y-3">
+          <h4 class="text-sm font-black text-emerald-400 flex items-center gap-2">
+            <i class="fa-solid fa-book-bookmark"></i> Talonario de Compradores — Lineales
+          </h4>
+          <button onclick="guardarTalonarioLinealesActual()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Guardar Talonario Lineales Actual</span>
+          </button>
+          <div class="overflow-x-auto rounded-xl border border-gray-800">
+            <table class="w-full text-left text-sm text-gray-300">
+              <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
+                <tr>
+                  <th class="p-2.5 md:p-3">Sorteo</th>
+                  <th class="p-2.5 md:p-3">Guardado el</th>
+                  <th class="p-2.5 md:p-3"># Filas</th>
+                  <th class="p-2.5 md:p-3">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="talonarios-lineales-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Reiniciar Sorteo Lineales -->
+        <div class="bg-red-950/20 border border-red-800/40 rounded-2xl p-3.5 md:p-4 space-y-2.5">
+          <h4 class="text-sm font-black text-red-400 flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> Iniciar Nuevo Sorteo Lineales
+          </h4>
+          <p class="text-[11px] text-gray-400">Borra todas las filas reservadas/vendidas de Lineales (no afecta el sorteo principal). Se guarda automáticamente el talonario antes de borrar.</p>
+          <button onclick="reiniciarLineales()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <span>Reiniciar Filas (Nuevo Sorteo Lineales)</span>
+          </button>
+        </div>
+
+        <!-- Ganador Lineales -->
+        <div class="bg-amber-500/5 border border-amber-500/30 rounded-2xl p-3.5 md:p-4 space-y-3">
+          <h4 class="text-sm font-black text-amber-400 flex items-center gap-2">
+            <i class="fa-solid fa-trophy"></i> Consultar Fila Ganadora
+          </h4>
+          <div class="flex flex-col md:flex-row gap-3 items-end">
+            <div class="w-full md:w-1/2">
+              <label class="block text-xs font-semibold text-gray-300 mb-1">Número de fila ganadora (1 a 25)</label>
+              <input type="text" id="admin-winner-fila" placeholder="Ej: 1, 13, 25" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
+            </div>
+            <button onclick="buscarGanadorLineal()" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-black font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>Buscar Ganador</span>
+            </button>
+          </div>
+          <div id="winner-result-lineales" class="hidden p-3.5 rounded-xl border"></div>
+        </div>
+
+        <div class="bg-brand-card border border-amber-500/20 rounded-2xl p-3.5 md:p-4 space-y-3">
+          <h4 class="text-sm font-black text-amber-300 flex items-center gap-2">
+            <i class="fa-solid fa-book"></i> Historial de Ganadores — Lineales
+          </h4>
+          <div class="overflow-x-auto rounded-xl border border-gray-800">
+            <table class="w-full text-left text-sm text-gray-300">
+              <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
+                <tr>
+                  <th class="p-2.5 md:p-3">Sorteo</th>
+                  <th class="p-2.5 md:p-3">Fila</th>
+                  <th class="p-2.5 md:p-3">Ganador</th>
+                  <th class="p-2.5 md:p-3">Teléfono</th>
+                  <th class="p-2.5 md:p-3">Fecha</th>
+                  <th class="p-2.5 md:p-3">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="ganadores-lineales-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Bloqueo manual y tabla de filas -->
+        <div class="bg-black/20 border border-gray-800/60 rounded-2xl p-3.5 md:p-4 flex flex-col md:flex-row gap-3 items-end">
+          <div class="w-full md:w-1/2">
+            <label class="block text-xs font-semibold text-gray-300 mb-1">Marcar fila como RESERVADA (Manual)</label>
+            <input type="text" id="admin-block-fila" placeholder="Ej: 1, 12, 25" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white">
+          </div>
+          <button onclick="adminBloquearFila()" class="w-full md:w-auto bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all">
+            Marcar Reservada
+          </button>
+        </div>
+
+        <div class="overflow-x-auto bg-brand-card rounded-2xl border border-gray-800">
+          <table class="w-full text-left text-sm text-gray-300">
+            <thead class="bg-gray-900/80 text-gray-400 text-xs uppercase border-b border-gray-800">
+              <tr>
+                <th class="p-3 md:p-4">Fila</th>
+                <th class="p-3 md:p-4">Números</th>
+                <th class="p-3 md:p-4">Cliente</th>
+                <th class="p-3 md:p-4">Teléfono</th>
+                <th class="p-3 md:p-4">Estado</th>
+                <th class="p-3 md:p-4">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-body-lineales"></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- TALONARIO DE COMPRADORES (HISTORIAL COMPLETO) -->
@@ -513,6 +831,9 @@
       fecha: '',
       ubicacion: '',
       banner: '',
+      linealesBanner: '',
+      linealesActivo: false,
+      linealesPrecio: '',
       premios: [
         { label: 'Dos últimas', valor: '50.000' },
         { label: 'Dos primeras', valor: '20.000' },
@@ -546,12 +867,593 @@
     let ultimoGanadorEncontrado = null;
     let talonariosData = {};
 
-    // Escuchador en tiempo real del historial de ganadores (talonario de ganadores)
+    // -------- SORTEO LINEALES (25 filas x 4 números: fila r -> r-1, r+24, r+49, r+74) --------
+    const LINEALES_FILAS = Array.from({ length: 25 }, (_, i) => {
+      const base = i; // 0..24
+      return [base, base + 25, base + 50, base + 75].map(n => n.toString().padStart(2, '0'));
+    });
+
+    function emojiKeycap(n) {
+      if (n === 10) return '🔟';
+      const map = { '0': '0️⃣', '1': '1️⃣', '2': '2️⃣', '3': '3️⃣', '4': '4️⃣', '5': '5️⃣', '6': '6️⃣', '7': '7️⃣', '8': '8️⃣', '9': '9️⃣' };
+      return n.toString().split('').map(d => map[d]).join('');
+    }
+
+    // Nodos de Firebase EXCLUSIVOS del Sorteo Lineales (independiente del sorteo principal)
+    const linealesOcupadosRef = db.ref('linealesOcupados');
+    const linealesTalonariosRef = db.ref('linealesTalonarios');
+    const ganadoresLinealesRef = db.ref('ganadoresLineales');
+
+    let selectedFilas = [];
+    let linealesOcupados = {};
+    let linealesTalonariosData = {};
+    let ultimoGanadorLineal = null;
+
+    function estadoFila(filaKey) {
+      const data = linealesOcupados[filaKey];
+      if (!data) return 'libre';
+      return estaPagado(data) ? 'pagado' : 'reservado';
+    }
+
+    function renderLineales() {
+      const section = document.getElementById('sorteo-lineales-section');
+      if (!raffleConfig.linealesActivo) {
+        section.classList.add('hidden');
+        return;
+      }
+      section.classList.remove('hidden');
+
+      const precioHero = document.getElementById('lineales-precio-hero');
+      if (raffleConfig.linealesPrecio) {
+        precioHero.innerHTML = `<i class="fa-solid fa-ticket text-amber-400"></i> ${raffleConfig.linealesPrecio} / fila`;
+        precioHero.classList.remove('hidden');
+        precioHero.classList.add('flex');
+      } else {
+        precioHero.classList.add('hidden');
+        precioHero.classList.remove('flex');
+      }
+
+      const linealesKeys = Object.keys(linealesOcupados);
+      const linealesVendidos = linealesKeys.filter(k => estaPagado(linealesOcupados[k])).length;
+      const linealesReservados = linealesKeys.length - linealesVendidos;
+      document.getElementById('lineales-stat-libres').innerText = 25 - linealesKeys.length;
+      document.getElementById('lineales-stat-reservados').innerText = linealesReservados;
+      document.getElementById('lineales-stat-vendidos').innerText = linealesVendidos;
+
+      const grid = document.getElementById('lineales-grid');
+      grid.innerHTML = LINEALES_FILAS.map((_, idx) => {
+        const filaKey = (idx + 1).toString().padStart(2, '0');
+        const filaLabel = emojiKeycap(idx + 1);
+        const nums = getFilaNumeros(idx);
+        const estado = estadoFila(filaKey);
+        const data = linealesOcupados[filaKey];
+        const isOccupied = estado !== 'libre';
+        const isSelected = selectedFilas.includes(filaKey);
+        const nombreCorto = (isOccupied && typeof data === 'object' && data.nombre) ? data.nombre.split(' ')[0] : '';
+
+        let rowStyle = 'w-full flex items-center gap-2 rounded-xl px-2.5 py-1.5 md:px-3 md:py-2 border transition-all text-left ';
+        if (estado === 'pagado') rowStyle += 'bg-red-950/30 border-red-900/50 opacity-70 cursor-not-allowed';
+        else if (estado === 'reservado') rowStyle += 'bg-amber-900/20 border-amber-700/50 opacity-80 cursor-not-allowed';
+        else if (isSelected) rowStyle += 'bg-amber-500/10 border-2 border-amber-400 shadow-lg shadow-amber-500/20';
+        else rowStyle += 'bg-black/30 border-gray-800/60 hover:border-amber-500/50 cursor-pointer';
+
+        const chips = nums.map(numStr => {
+          let chipStyle = 'flex-1 text-center rounded-xl py-2 text-xs md:text-sm font-black border transition-all flex items-center justify-center gap-1 ';
+          if (estado === 'pagado') chipStyle += 'bg-red-950/40 border-red-800 text-red-400';
+          else if (estado === 'reservado') chipStyle += 'bg-amber-900/40 border-amber-700 text-amber-300';
+          else if (isSelected) chipStyle += 'bg-gradient-to-tr from-amber-500 to-amber-400 border-amber-300 text-black shadow-md shadow-amber-500/30 scale-105';
+          else chipStyle += 'bg-brand-card border-gray-800 text-gray-300';
+          const check = (isSelected && estado === 'libre') ? '<i class="fa-solid fa-check text-[9px] md:text-[10px]"></i>' : '';
+          return `<span class="${chipStyle}">${check}${numStr}</span>`;
+        }).join('');
+
+        return `
+          <button type="button" ${isOccupied ? 'disabled' : ''} onclick="toggleFilaSelection('${filaKey}')" class="${rowStyle}">
+            <span class="shrink-0 text-sm md:text-base w-8 md:w-9 text-center">${filaLabel}</span>
+            <div class="flex-1 flex gap-1.5 md:gap-2">${chips}</div>
+            ${nombreCorto ? `<span class="shrink-0 text-[9px] md:text-[10px] text-gray-400 max-w-[60px] truncate">${nombreCorto}</span>` : ''}
+          </button>
+        `;
+      }).join('');
+
+      updateLinealesCart();
+    }
+
+    function toggleFilaSelection(filaKey) {
+      if (selectedFilas.includes(filaKey)) {
+        selectedFilas = selectedFilas.filter(f => f !== filaKey);
+      } else {
+        selectedFilas.push(filaKey);
+      }
+      renderLineales();
+          actualizarBannerLineales();
+    }
+
+    function updateLinealesCart() {
+      const cart = document.getElementById('lineales-cart');
+      const list = document.getElementById('lineales-selected-list');
+      if (selectedFilas.length > 0) {
+        cart.classList.remove('hidden');
+        cart.classList.add('flex');
+        list.innerHTML = selectedFilas.map(f =>
+          `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold px-2 py-0.5 rounded-lg text-[10px] md:text-xs">Fila ${parseInt(f, 10)}</span>`
+        ).join('');
+      } else {
+        cart.classList.add('hidden');
+        cart.classList.remove('flex');
+      }
+    }
+
+    function openCheckoutModalLineales() {
+      document.getElementById('user-filas').value = selectedFilas.map(f => parseInt(f, 10)).join(', ');
+      document.getElementById('user-name-lineales').value = '';
+      document.getElementById('user-phone-lineales').value = '';
+      document.getElementById('modal-checkout-lineales').classList.remove('hidden');
+      document.getElementById('modal-checkout-lineales').classList.add('flex');
+    }
+
+    function closeCheckoutModalLineales() {
+      document.getElementById('modal-checkout-lineales').classList.add('hidden');
+      document.getElementById('modal-checkout-lineales').classList.remove('flex');
+    }
+
+    async function handleReservaLineales(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('user-name-lineales').value.trim();
+      const phone = document.getElementById('user-phone-lineales').value.trim();
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Verificando...</span>';
+
+      let current;
+      try {
+        const snapshot = await linealesOcupadosRef.once('value');
+        current = snapshot.val() || {};
+      } catch (err) {
+        alert('No se pudo conectar con la base de datos. Revisa tu internet e inténtalo de nuevo.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
+        return;
+      }
+
+      const conflictos = selectedFilas.filter(f => current[f]);
+      if (conflictos.length > 0) {
+        linealesOcupados = current;
+        selectedFilas = selectedFilas.filter(f => !conflictos.includes(f));
+        renderLineales();
+          actualizarBannerLineales();
+        closeCheckoutModalLineales();
+        alert(`¡Justo a tiempo! Las siguientes filas ya fueron apartadas por otra persona: ${conflictos.map(f => parseInt(f, 10)).join(', ')}.\n\nLas quitamos de tu selección. Por favor elige otras filas.`);
+        return;
+      }
+
+      const confirmar = confirm(`¿Seguro son todas las filas que escogerás? (${selectedFilas.map(f => parseInt(f, 10)).join(', ')})\nPor favor, verifica tus datos antes de continuar.`);
+      if (!confirmar) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
+        return;
+      }
+
+      const updates = {};
+      selectedFilas.forEach(filaKey => {
+        updates[filaKey] = {
+          nombre: name,
+          telefono: phone,
+          fecha: new Date().toLocaleDateString(),
+          pagado: false
+        };
+      });
+
+      try {
+        await linealesOcupadosRef.update(updates);
+      } catch (err) {
+        alert('Ocurrió un error al guardar tu reserva. Inténtalo de nuevo.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
+        return;
+      }
+
+      const filasTexto = selectedFilas.map(f => {
+        const idx = parseInt(f, 10) - 1;
+        return `Fila ${parseInt(f, 10)} (${getFilaNumeros(idx).join('-')})`;
+      }).join(' | ');
+
+      const mensaje = `Hola PYA, quiero hacer la reserva de mis filas del *Sorteo Lineales*:%0A%0A` +
+        `👤 *Nombre:* ${encodeURIComponent(name)}%0A` +
+        `📱 *Teléfono:* ${encodeURIComponent(phone)}%0A` +
+        `🎟️ *Fila(s):* ${encodeURIComponent(filasTexto)}%0A%0A` +
+        `Quedo atento a las instrucciones para enviar el comprobante de pago.`;
+
+      window.open(`https://wa.me/${ADMIN_WHATSAPP}?text=${mensaje}`, '_blank');
+
+      selectedFilas = [];
+      closeCheckoutModalLineales();
+      renderLineales();
+          actualizarBannerLineales();
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>Continuar</span><i class="fa-solid fa-arrow-right"></i>';
+    }
+
+    // -------- ADMIN: TABLA DE FILAS (LINEALES) --------
+    function renderAdminTableLineales() {
+      const tbody = document.getElementById('admin-table-body-lineales');
+      if (!tbody) return;
+      const keys = Object.keys(linealesOcupados);
+      if (keys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500 text-xs">No hay filas marcadas como reservadas o vendidas.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = keys.sort().map(filaKey => {
+        const data = linealesOcupados[filaKey];
+        const cliente = (typeof data === 'object') ? (data.nombre || 'Bloqueado por Admin') : 'Bloqueado por Admin';
+        const telefono = (typeof data === 'object') ? (data.telefono || 'N/A') : 'N/A';
+        const pagado = estaPagado(data);
+        const idx = parseInt(filaKey, 10) - 1;
+        const numeros = getFilaNumeros(idx).join('-');
+        return `
+          <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
+            <td class="p-3 md:p-4 font-black text-amber-400 text-sm md:text-base">${parseInt(filaKey, 10)}</td>
+            <td class="p-3 md:p-4 text-gray-400 text-xs">${numeros}</td>
+            <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${cliente}</td>
+            <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${telefono}</td>
+            <td class="p-3 md:p-4">
+              <span class="px-2 py-1 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-950/40 border-red-800 text-red-300' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">
+                ${pagado ? 'PAGADO' : 'RESERVADO'}
+              </span>
+            </td>
+            <td class="p-3 md:p-4 flex flex-wrap gap-2">
+              <button onclick="adminTogglePagadoLineales('${filaKey}')" class="${pagado ? 'bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border-amber-500/30' : 'bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 border-red-500/30'} border px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
+                ${pagado ? 'Marcar Reservado' : 'Ya Pagó'}
+              </button>
+              <button onclick="adminLiberarFila('${filaKey}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-black border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
+                Liberar
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function adminTogglePagadoLineales(filaKey) {
+      const data = linealesOcupados[filaKey];
+      const actual = estaPagado(data);
+      linealesOcupadosRef.child(filaKey).update({ pagado: !actual });
+    }
+
+    function adminBloquearFila() {
+      const val = document.getElementById('admin-block-fila').value.trim();
+      if (!val) return;
+      const n = parseInt(val, 10);
+      if (!n || n < 1 || n > 25) {
+        alert('La fila debe ser un número entre 1 y 25.');
+        return;
+      }
+      const filaKey = n.toString().padStart(2, '0');
+      linealesOcupadosRef.child(filaKey).set({
+        nombre: 'Bloqueado Manualmente',
+        telefono: 'N/A',
+        fecha: new Date().toLocaleDateString(),
+        pagado: false
+      });
+      document.getElementById('admin-block-fila').value = '';
+    }
+
+    function adminLiberarFila(filaKey) {
+      linealesOcupadosRef.child(filaKey).remove();
+    }
+
+    // -------- ADMIN: GANADOR LINEALES --------
+    function buscarGanadorLineal() {
+      const input = document.getElementById('admin-winner-fila').value.trim();
+      const resContainer = document.getElementById('winner-result-lineales');
+      resContainer.classList.remove('hidden');
+      ultimoGanadorLineal = null;
+
+      const n = parseInt(input, 10);
+      if (!n || n < 1 || n > 25) {
+        resContainer.className = "p-3.5 rounded-xl border bg-red-950/40 border-red-800 text-red-300 text-sm space-y-1";
+        resContainer.innerHTML = `<p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> Escribe un número de fila válido (1 a 25).</p>`;
+        return;
+      }
+
+      const filaKey = n.toString().padStart(2, '0');
+      const data = linealesOcupados[filaKey];
+      const numeros = getFilaNumeros(n - 1).join('-');
+
+      if (!data) {
+        resContainer.className = "p-3.5 rounded-xl border bg-red-950/40 border-red-800 text-red-300 text-sm space-y-1";
+        resContainer.innerHTML = `
+          <p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> La fila ${n} (${numeros}) NO fue vendida / comprada.</p>
+          <p class="text-xs text-red-400">El premio queda vacante o acumula según las políticas del sorteo.</p>
+        `;
+        return;
+      }
+
+      const cliente = (typeof data === 'object') ? (data.nombre || 'Sin nombre asignado') : 'Sin nombre asignado';
+      const telefono = (typeof data === 'object') ? (data.telefono || '') : '';
+
+      let cleanPhone = telefono.replace(/\D/g, '');
+      if (cleanPhone.length === 10) cleanPhone = '57' + cleanPhone;
+
+      const mensajeGanador = `¡Hola ${cliente}! 🎉🥳%0A%0ATenemos excelentes noticias de *PYA SORTEOS - LINEALES*. Tu fila *${n} (${numeros})* ha sido la *GANADORA*. 🏆%0A%0APor favor respóndenos a este mensaje para coordinar la entrega de tu premio.%0A%0A¡Muchas felicidades! 👏`;
+
+      ultimoGanadorLineal = { fila: n, numeros, nombre: cliente, telefono: telefono || '' };
+
+      resContainer.className = "p-3.5 rounded-xl border bg-emerald-950/40 border-emerald-800 text-emerald-200 text-sm space-y-3";
+      resContainer.innerHTML = `
+        <div class="flex items-center gap-2 font-bold text-emerald-400">
+          <i class="fa-solid fa-trophy text-amber-400 text-lg"></i>
+          <span>¡FILA GANADORA ENCONTRADA!</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs bg-black/40 p-3 rounded-lg border border-emerald-800/50">
+          <p><strong class="text-gray-400">Fila:</strong> <span class="text-amber-400 font-bold text-sm">${n} (${numeros})</span></p>
+          <p><strong class="text-gray-400">Ganador(a):</strong> <span class="text-white font-bold">${cliente}</span></p>
+          <p><strong class="text-gray-400">Teléfono:</strong> <span class="text-white font-bold">${telefono || 'N/A'}</span></p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          ${cleanPhone ? `
+            <a href="https://wa.me/${cleanPhone}?text=${mensajeGanador}" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/20">
+              <i class="fa-brands fa-whatsapp text-base"></i>
+              <span>Notificar Ganador por WhatsApp</span>
+            </a>
+          ` : `<p class="text-xs text-amber-400 font-semibold">Esta fila fue bloqueada manualmente y no tiene un teléfono registrado.</p>`}
+          <button onclick="guardarGanadorLinealActual()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all">
+            <i class="fa-solid fa-bookmark"></i>
+            <span>Guardar en Historial</span>
+          </button>
+        </div>
+      `;
+    }
+
+    function guardarGanadorLinealActual() {
+      if (!ultimoGanadorLineal) return;
+      ganadoresLinealesRef.push({
+        sorteo: raffleConfig.titulo || 'Sin título',
+        fila: ultimoGanadorLineal.fila,
+        numeros: ultimoGanadorLineal.numeros,
+        nombre: ultimoGanadorLineal.nombre,
+        telefono: ultimoGanadorLineal.telefono || '',
+        fecha: new Date().toLocaleDateString()
+      }).then(() => {
+        alert('Ganador de Lineales guardado en el historial.');
+      }).catch(() => {
+        alert('No se pudo guardar en el historial. Revisa tu conexión.');
+      });
+    }
+
+    function eliminarGanadorLineal(key) {
+      if (!confirm('¿Borrar este registro del historial de ganadores de Lineales?')) return;
+      ganadoresLinealesRef.child(key).remove();
+    }
+
+    function renderGanadoresLinealesTable(data) {
+      const tbody = document.getElementById('ganadores-lineales-table-body');
+      if (!tbody) return;
+      const entries = Object.entries(data).reverse();
+      if (entries.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500 text-xs">Todavía no hay ganadores guardados.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = entries.map(([key, g]) => `
+        <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
+          <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${g.sorteo || '-'}</td>
+          <td class="p-3 md:p-4 font-black text-amber-400 text-sm">${g.fila || '-'} ${g.numeros ? `(${g.numeros})` : ''}</td>
+          <td class="p-3 md:p-4 text-white text-xs md:text-sm">${g.nombre || '-'}</td>
+          <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${g.telefono || 'N/A'}</td>
+          <td class="p-3 md:p-4 text-gray-400 text-xs">${g.fecha || '-'}</td>
+          <td class="p-3 md:p-4">
+            <button onclick="eliminarGanadorLineal('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">
+              Borrar
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // -------- ADMIN: TALONARIO Y REINICIO DE LINEALES --------
+    function construirSnapshotTalonarioLineales() {
+      return {
+        sorteo: raffleConfig.titulo || 'Sin título',
+        fechaGuardado: new Date().toLocaleString(),
+        filas: JSON.parse(JSON.stringify(linealesOcupados))
+      };
+    }
+
+    function guardarTalonarioLinealesActual() {
+      const keys = Object.keys(linealesOcupados);
+      if (keys.length === 0) {
+        alert('Todavía no hay ninguna fila reservada o vendida para guardar.');
+        return;
+      }
+      if (!confirm(`¿Guardar el talonario de Lineales actual con ${keys.length} fila(s) registradas? Esto NO borra las filas actuales.`)) return;
+
+      linealesTalonariosRef.push(construirSnapshotTalonarioLineales()).then(() => {
+        alert('Talonario de Lineales guardado correctamente en el historial.');
+      }).catch(() => {
+        alert('No se pudo guardar el talonario. Revisa tu conexión.');
+      });
+    }
+
+    function renderTalonariosLinealesTable() {
+      const tbody = document.getElementById('talonarios-lineales-table-body');
+      if (!tbody) return;
+      const entries = Object.entries(linealesTalonariosData).reverse();
+      if (entries.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-500 text-xs">Todavía no hay talonarios de Lineales guardados.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = entries.map(([key, t]) => {
+        const cantidad = t.filas ? Object.keys(t.filas).length : 0;
+        return `
+          <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
+            <td class="p-2.5 md:p-3 text-white font-medium text-xs md:text-sm">${t.sorteo || '-'}</td>
+            <td class="p-2.5 md:p-3 text-gray-400 text-xs">${t.fechaGuardado || '-'}</td>
+            <td class="p-2.5 md:p-3 text-amber-400 font-bold text-sm">${cantidad}</td>
+            <td class="p-2.5 md:p-3">
+              <button onclick="eliminarTalonarioLineales('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Borrar</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function eliminarTalonarioLineales(key) {
+      if (!confirm('¿Borrar este talonario de Lineales guardado? Esta acción no se puede deshacer.')) return;
+      linealesTalonariosRef.child(key).remove();
+    }
+
+    function reiniciarLineales() {
+      const paso1 = confirm('¿Seguro que quieres iniciar un NUEVO SORTEO LINEALES?\n\nEsto borrará TODAS las filas reservadas y vendidas actuales de Lineales (no afecta el sorteo principal).\n\nAntes de borrar, se guardará automáticamente una copia del talonario actual en el historial.\n\nEsta acción NO se puede deshacer.');
+      if (!paso1) return;
+
+      const paso2 = prompt('Para confirmar, escribe la palabra REINICIAR (en mayúsculas):');
+      if (paso2 !== 'REINICIAR') {
+        alert('No se realizó el reinicio porque el texto no coincidió.');
+        return;
+      }
+
+      const keys = Object.keys(linealesOcupados);
+      const guardarPrimero = keys.length > 0
+        ? linealesTalonariosRef.push(construirSnapshotTalonarioLineales())
+        : Promise.resolve();
+
+      guardarPrimero.then(() => {
+        const updates = {};
+        for (let i = 1; i <= 25; i++) {
+          updates[i.toString().padStart(2, '0')] = null;
+        }
+        return linealesOcupadosRef.update(updates);
+      }).then(() => {
+        alert('¡Listo! Se guardó el talonario anterior de Lineales (si tenía filas) y todas las filas quedaron libres.');
+      }).catch(() => {
+        alert('No se pudo reiniciar Lineales. Revisa tu conexión.');
+      });
+    }
+
+    // -------- ADMIN: GUARDAR CONFIG PROPIA DE LINEALES (no toca los campos del sorteo principal) --------
+    
+function setBannerValueLineales(dataUrl) {
+  document.getElementById('cfg-lineales-banner').value = dataUrl;
+  const preview = document.getElementById('cfg-lineales-banner-preview');
+  const empty = document.getElementById('cfg-lineales-banner-preview-empty');
+  preview.src = dataUrl;
+  preview.classList.remove('hidden');
+  empty.classList.add('hidden');
+}
+
+function quitarBannerLineales() {
+  document.getElementById('cfg-lineales-banner').value = '';
+  document.getElementById('cfg-lineales-banner-file').value = '';
+  document.getElementById('cfg-lineales-banner-preview').classList.add('hidden');
+  document.getElementById('cfg-lineales-banner-preview-empty').classList.remove('hidden');
+  document.getElementById('cfg-lineales-banner-status').innerText = 'Se quitará al guardar la configuración.';
+}
+
+function handleLinealesBannerFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('cfg-lineales-banner-status');
+  statusEl.innerText = 'Procesando imagen...';
+
+  // Los GIF no se pueden comprimir sin perder la animación: se validan por peso.
+  if (file.type === 'image/gif') {
+    if (file.size > 350 * 1024) {
+      statusEl.innerText = 'Ese GIF pesa mucho (máx. ~350KB). Elige uno más liviano para que cargue rápido en el celular de todos.';
+      event.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setBannerValueLineales(ev.target.result);
+      statusEl.innerText = 'GIF listo. No olvides pulsar "Guardar Config. Lineales".';
+    };
+    reader.readAsDataURL(file);
+    return;
+  }
+
+  // Fotos normales: se redimensionan y comprimen en el navegador antes de guardarlas.
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      const maxDim = 400;
+      let w = img.width, h = img.height;
+      if (w > h && w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
+      else if (h >= w && h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      setBannerValueLineales(dataUrl);
+      statusEl.innerText = 'Imagen lista. No olvides pulsar "Guardar Config. Lineales".';
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function actualizarBannerLineales() {
+  const img = document.getElementById("lineales-banner-img");
+  const fallback = document.getElementById("lineales-banner-fallback");
+  if (!img || !fallback) return;
+  if (raffleConfig.linealesBanner) {
+    img.src = raffleConfig.linealesBanner;
+    img.classList.remove("hidden");
+    fallback.classList.add("hidden");
+  } else {
+    img.classList.add("hidden");
+    fallback.classList.remove("hidden");
+  }
+}
+
+function guardarConfigLineales() {
+
+  const nuevaConfig = Object.assign({}, raffleConfig, {
+    linealesActivo: document.getElementById('cfg-lineales-activo').checked,
+    linealesPrecio: document.getElementById('cfg-lineales-precio').value.trim(),
+    linealesBanner: document.getElementById('cfg-lineales-banner').value.trim()
+  });
+
+  configRef.set(nuevaConfig)
+    .then(() => {
+      alert('Configuración de Sorteo Lineales guardada correctamente.');
+      raffleConfig.linealesBanner = nuevaConfig.linealesBanner;
+      actualizarBannerLineales();
+    })
+    .catch((error) => {
+      console.error(error);
+      alert('Error al guardar la configuración.');
+    });
+}
+
+    // Escuchadores en tiempo real EXCLUSIVOS del Sorteo Lineales
+    linealesOcupadosRef.on('value', (snapshot) => {
+      linealesOcupados = snapshot.val() || {};
+      renderLineales();
+          actualizarBannerLineales();
+      if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) {
+        renderAdminTableLineales();
+      }
+    });
+
+    linealesTalonariosRef.on('value', (snapshot) => {
+      linealesTalonariosData = snapshot.val() || {};
+      renderTalonariosLinealesTable();
+    });
+
+    ganadoresLinealesRef.on('value', (snapshot) => {
+      renderGanadoresLinealesTable(snapshot.val() || {});
+    });
+
+    // Escuchador en tiempo real del historial de ganadores (talonario de ganadores) — sorteo principal
     ganadoresRef.on('value', (snapshot) => {
       renderGanadoresTable(snapshot.val() || {});
     });
 
-    // Escuchador en tiempo real del historial de talonarios (compradores completos)
+    // Escuchador en tiempo real del historial de talonarios (compradores completos) — sorteo principal
     talonariosRef.on('value', (snapshot) => {
       talonariosData = snapshot.val() || {};
       renderTalonariosTable();
@@ -778,6 +1680,8 @@
         }
       }
       renderHero();
+      renderLineales();
+          actualizarBannerLineales();
       if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) {
         cargarConfigEnFormulario();
       }
@@ -798,7 +1702,11 @@
     }
 
     function estaPagado(data) {
-      return !!(data && typeof data === 'object' && data.pagado);
+      // Antes: !!(data && typeof data === 'object' && data.pagado)
+      // Ese "!!" convierte a "true" CUALQUIER valor que no esté vacío,
+      // incluyendo el texto "false" (string), el número 0 guardado como texto, etc.
+      // Ahora exigimos que sea EXACTAMENTE el booleano true.
+      return !!(data && typeof data === 'object' && data.pagado === true);
     }
 
     function updateStats() {
@@ -1033,6 +1941,7 @@
       document.getElementById('modal-admin-dashboard').classList.remove('hidden');
       document.getElementById('modal-admin-dashboard').classList.add('flex');
       renderAdminTable();
+      renderAdminTableLineales();
       cargarConfigEnFormulario();
     }
 
@@ -1169,6 +2078,22 @@
       document.getElementById('cfg-precio').value = raffleConfig.precio || '';
       document.getElementById('cfg-fecha').value = raffleConfig.fecha || '';
       document.getElementById('cfg-ubicacion').value = raffleConfig.ubicacion || '';
+      document.getElementById('cfg-lineales-activo').checked = !!raffleConfig.linealesActivo;
+      document.getElementById('cfg-lineales-precio').value = raffleConfig.linealesPrecio || '';
+      const linealesBannerVal = raffleConfig.linealesBanner || '';
+      document.getElementById('cfg-lineales-banner').value = linealesBannerVal;
+      document.getElementById('cfg-lineales-banner-file').value = '';
+      document.getElementById('cfg-lineales-banner-status').innerText = 'Si no subes nada, se muestra un ícono animado por defecto. Los GIF pesados (más de ~350KB) no se aceptan para que la página cargue rápido.';
+      const linealesPreviewImg = document.getElementById('cfg-lineales-banner-preview');
+      const linealesPreviewEmpty = document.getElementById('cfg-lineales-banner-preview-empty');
+      if (linealesBannerVal) {
+        linealesPreviewImg.src = linealesBannerVal;
+        linealesPreviewImg.classList.remove('hidden');
+        linealesPreviewEmpty.classList.add('hidden');
+      } else {
+        linealesPreviewImg.classList.add('hidden');
+        linealesPreviewEmpty.classList.remove('hidden');
+      }
       const bannerVal = raffleConfig.banner || '';
       document.getElementById('cfg-banner').value = bannerVal;
       document.getElementById('cfg-banner-file').value = '';
@@ -1184,6 +2109,7 @@
         previewEmpty.classList.remove('hidden');
       }
       renderPremiosForm();
+      renderLinealesNumerosForm();
     }
 
     function renderPremiosForm() {
@@ -1215,6 +2141,57 @@
     function eliminarFilaPremio(i) {
       raffleConfig.premios.splice(i, 1);
       renderPremiosForm();
+    }
+
+    // -------- ADMIN: EDITOR DE NÚMEROS DE CADA FILA (LINEALES) --------
+    function getFilaNumeros(idx) {
+      const custom = raffleConfig.linealesNumeros;
+      if (custom && custom[idx] && custom[idx].length === 4) return custom[idx];
+      return LINEALES_FILAS[idx];
+    }
+
+    function renderLinealesNumerosForm() {
+      const wrap = document.getElementById('cfg-lineales-numeros');
+      if (!wrap) return;
+      wrap.innerHTML = LINEALES_FILAS.map((_, idx) => {
+        const nums = getFilaNumeros(idx);
+        const inputs = nums.map((val, col) => `
+          <input type="text" maxlength="2" inputmode="numeric" value="${val}" data-fila="${idx}" data-col="${col}" oninput="this.value=this.value.replace(/[^0-9]/g,'')" class="w-12 text-center bg-black/60 border border-gray-700/80 rounded-lg p-1.5 text-xs text-white">
+        `).join('');
+        return `
+          <div class="flex items-center gap-2">
+            <span class="w-14 shrink-0 text-[10px] font-bold text-gray-400">Fila ${idx + 1}</span>
+            <div class="flex gap-1.5">${inputs}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function guardarLinealesNumeros() {
+      const wrap = document.getElementById('cfg-lineales-numeros');
+      const inputs = wrap.querySelectorAll('input');
+      const nuevo = LINEALES_FILAS.map(() => ['', '', '', '']);
+
+      inputs.forEach((inp) => {
+        const fila = parseInt(inp.dataset.fila, 10);
+        const col = parseInt(inp.dataset.col, 10);
+        let val = inp.value.trim();
+        if (val === '') val = '00';
+        nuevo[fila][col] = val.padStart(2, '0');
+      });
+
+      const nuevaConfig = Object.assign({}, raffleConfig, { linealesNumeros: nuevo });
+      configRef.set(nuevaConfig).then(() => {
+        alert('Números de Sorteo Lineales guardados. Ya se actualizaron para todos los visitantes.');
+      }).catch(() => {
+        alert('No se pudieron guardar los números. Revisa tu conexión.');
+      });
+    }
+
+    function restaurarLinealesNumerosPorDefecto() {
+      if (!confirm('¿Restaurar los números originales (00 a 99 en orden) para las 25 filas?')) return;
+      raffleConfig.linealesNumeros = null;
+      renderLinealesNumerosForm();
     }
 
     function setBannerValue(dataUrl) {
@@ -1308,14 +2285,16 @@
     }
 
     function guardarConfig() {
-      const nuevaConfig = {
+      // Se preservan linealesActivo/linealesPrecio/linealesNumeros tal como están (esa rifa se guarda
+      // aparte, con sus propios botones), para mantener ambos sorteos independientes.
+      const nuevaConfig = Object.assign({}, raffleConfig, {
         titulo: document.getElementById('cfg-titulo').value.trim(),
         precio: document.getElementById('cfg-precio').value.trim(),
         fecha: document.getElementById('cfg-fecha').value.trim(),
         ubicacion: document.getElementById('cfg-ubicacion').value.trim(),
         banner: document.getElementById('cfg-banner').value.trim(),
         premios: (raffleConfig.premios || []).filter(p => p.label || p.valor)
-      };
+      });
 
       configRef.set(nuevaConfig).then(() => {
         alert('Configuración guardada. Ya se actualizó para todos los visitantes.');
@@ -1326,6 +2305,8 @@
 
     renderHero();
     renderGrid();
+    renderLineales();
+          actualizarBannerLineales();
   </script>
 </body>
 </html>
