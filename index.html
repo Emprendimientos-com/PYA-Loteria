@@ -30,16 +30,16 @@
     @keyframes flash-badge { 0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.6); } 50% { box-shadow: 0 0 0 6px rgba(251,191,36,0); } }
     .badge-flash { animation: flash-badge 1.8s ease-in-out infinite; }
     
-    /* EFECTO DE BORDE BRILLANTE GIRATORIO (CORREGIDO) */
+    /* EFECTO DE BORDE BRILLANTE GIRATORIO */
     .glow-border-wrap {
       position: relative;
       padding: 3px;
-      border-radius: 1rem; /* rounded-2xl */
+      border-radius: 1rem;
       overflow: hidden;
       background: #08090c;
     }
     @media (min-width: 768px) {
-      .glow-border-wrap { border-radius: 1.5rem; } /* md:rounded-3xl */
+      .glow-border-wrap { border-radius: 1.5rem; }
     }
     .glow-border-wrap::before {
       content: '';
@@ -68,9 +68,77 @@
       from { transform: rotate(0deg); } 
       to { transform: rotate(360deg); } 
     }
+
+    /* PRELOADER */
+    #preloader {
+      position: fixed;
+      inset: 0;
+      background: #08090c;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #preloader.hidden-loader {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .loader-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #f59e0b, #fbbf24, #fde68a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 40px;
+      color: #000;
+      box-shadow: 0 0 40px rgba(251, 191, 36, 0.4);
+      animation: pulse-logo 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-logo {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(251, 191, 36, 0.4); }
+      50% { transform: scale(1.08); box-shadow: 0 0 60px rgba(251, 191, 36, 0.6); }
+    }
+    .loader-text {
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 3px;
+      color: #fbbf24;
+      text-transform: uppercase;
+    }
+    .loader-dots {
+      display: inline-block;
+      animation: dots 1.4s infinite;
+    }
+    @keyframes dots {
+      0%, 20% { content: ''; }
+      40% { content: '.'; }
+      60% { content: '..'; }
+      80%, 100% { content: '...'; }
+    }
+
+    /* Ocultar contenido principal hasta que cargue */
+    #main-content {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    #main-content.loaded {
+      opacity: 1;
+    }
   </style>
 </head>
 <body class="bg-brand-bg text-gray-100 min-h-screen font-sans flex flex-col justify-between grid-pattern antialiased selection:bg-amber-500 selection:text-black">
+
+  <!-- PRELOADER -->
+  <div id="preloader">
+    <div class="loader-logo">P</div>
+    <div class="loader-text">PYA Sorteos<span class="loader-dots">...</span></div>
+  </div>
 
   <header class="py-3 px-4 md:py-4 md:px-12 border-b border-gray-800/80 glassmorphism sticky top-0 z-40 flex justify-between items-center shadow-2xl">
     <div class="flex items-center gap-2.5 md:gap-3">
@@ -90,9 +158,9 @@
     </div>
   </header>
 
-  <main class="max-w-6xl w-full mx-auto p-3 sm:p-4 md:p-8 flex-grow space-y-6 md:space-y-10 pb-28 sm:pb-32">
+  <main id="main-content" class="max-w-6xl w-full mx-auto p-3 sm:p-4 md:p-8 flex-grow space-y-6 md:space-y-10 pb-28 sm:pb-32">
     
-    <!-- HERO CON BORDE BRILLANTE AMARILLO (ESTRUCTURA CORREGIDA) -->
+    <!-- HERO CON BORDE BRILLANTE AMARILLO -->
     <div class="glow-border-wrap rounded-2xl md:rounded-3xl">
       <div class="relative z-10 rounded-2xl md:rounded-3xl p-5 md:p-10 border border-amber-500/30 glassmorphism overflow-hidden glow-gold bg-brand-bg">
         <div class="absolute -top-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -360,6 +428,31 @@
     const talonariosRef = db.ref('talonarios');
     let ultimoGanadorEncontrado = null;
     let talonariosData = {};
+
+    // ============ CONTROL DEL PRELOADER ============
+    let datosCargados = false;
+    let estilosListos = false;
+
+    function verificarYMostrarContenido() {
+      if (datosCargados && estilosListos) {
+        setTimeout(() => {
+          document.getElementById('preloader').classList.add('hidden-loader');
+          document.getElementById('main-content').classList.add('loaded');
+        }, 300); // Pequeño delay para que los estilos se apliquen bien
+      }
+    }
+
+    // Detectar cuando Tailwind esté listo
+    window.addEventListener('load', () => {
+      estilosListos = true;
+      verificarYMostrarContenido();
+    });
+
+    // Si Tailwind tarda mucho, forzar después de 2 segundos
+    setTimeout(() => {
+      estilosListos = true;
+      verificarYMostrarContenido();
+    }, 2000);
 
     function estaPagado(data) { return !!(data && typeof data === 'object' && data.pagado === true); }
 
@@ -841,6 +934,10 @@
       }
       renderHero();
       if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) cargarConfigEnFormulario();
+      
+      // Marcar datos como cargados y verificar
+      datosCargados = true;
+      verificarYMostrarContenido();
     });
 
     ganadoresRef.on('value', (snapshot) => { renderGanadoresTable(snapshot.val() || {}); });
