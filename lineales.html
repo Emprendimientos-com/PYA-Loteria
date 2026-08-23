@@ -367,10 +367,10 @@
     });
 
     function emojiKeycap(n) {
-      if (n === 10) return '🔟';
-      const map = { '0': '0️⃣', '1': '1️', '2': '2️⃣', '3': '3️⃣', '4': '4️⃣', '5': '5️⃣', '6': '6️⃣', '7': '7️', '8': '8️⃣', '9': '9️⃣' };
-      return n.toString().split('').map(d => map[d]).join('');
-    }
+  if (n === 10) return '🔟';
+  const map = { '0': '0️⃣', '1': '1️', '2': '2️⃣', '3': '3️⃣', '4': '4️⃣', '5': '5️⃣', '6': '6️⃣', '7': '7️', '8': '8️⃣', '9': '9️⃣' };
+  return n.toString().split('').map(d => map[d]).join('');
+}
 
     function estaPagado(data) { return !!(data && typeof data === 'object' && data.pagado === true); }
     function getFilaNumeros(idx) {
