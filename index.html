@@ -231,6 +231,16 @@
         <div id="winner-result" class="hidden p-4 rounded-xl border"></div>
       </div>
 
+      <div class="bg-gradient-to-r from-amber-500/10 to-amber-900/10 border border-amber-500/30 rounded-2xl p-4 md:p-6 space-y-4">
+        <h3 class="text-base md:text-lg font-black text-amber-400 flex items-center gap-2"><i class="fa-solid fa-user-magnifying-glass"></i> Buscar Comprador por Número</h3>
+        <div class="flex flex-col md:flex-row gap-4 items-end">
+          <div class="w-full md:w-1/2"><label class="block text-xs font-semibold text-gray-300 mb-1">Número jugado (00 a 99)</label><input type="text" id="admin-buscar-num" placeholder="Ej: 05, 42, 88" maxlength="2" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
+          <button onclick="buscarCompradorPorNumero()" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-black font-bold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-magnifying-glass"></i><span>Buscar</span></button>
+        </div>
+        <p class="text-[10px] text-gray-500">Escribe cualquier número que haya escogido un comprador y aquí verás su nombre y TODOS los números que tiene reservados o pagados.</p>
+        <div id="buscar-comprador-result" class="hidden p-4 rounded-xl border"></div>
+      </div>
+
       <div class="bg-brand-card border border-amber-500/20 rounded-2xl p-4 md:p-6 space-y-4">
         <h3 class="text-base md:text-lg font-black text-amber-300 flex items-center gap-2"><i class="fa-solid fa-book"></i> Historial de Ganadores</h3>
         <div class="overflow-x-auto rounded-xl border border-gray-800">
@@ -357,21 +367,6 @@
     function renderGrid() {
       const grid = document.getElementById('grid-numeros');
       grid.innerHTML = '';
-      
-      // Agrupar números por persona para evitar que se vean "regados"
-      const gruposPorPersona = {};
-      Object.keys(occupiedNumbers).forEach(num => {
-        const data = occupiedNumbers[num];
-        if (data && typeof data === 'object' && data.nombre) {
-          const key = `${data.nombre}|${data.telefono}`;
-          if (!gruposPorPersona[key]) gruposPorPersona[key] = [];
-          gruposPorPersona[key].push(num);
-        }
-      });
-      // Ordenar los números de cada persona de menor a mayor
-      Object.keys(gruposPorPersona).forEach(key => {
-        gruposPorPersona[key].sort((a, b) => parseInt(a) - parseInt(b));
-      });
 
       for (let i = 0; i < 100; i++) {
         const numStr = i.toString().padStart(2, '0');
@@ -394,13 +389,7 @@
         
         let nombreCorto = '';
         if (isOccupied && typeof data === 'object' && data.nombre) {
-          const key = `${data.nombre}|${data.telefono}`;
-          const grupo = gruposPorPersona[key];
-          const esPrimero = grupo && grupo[0] === numStr;
-          // Mostrar nombre en el primer número del grupo, o en todos si ya está pagado (para claridad)
-          if (esPrimero || isPaid) {
-            nombreCorto = data.nombre.split(' ')[0].slice(0, 5);
-          }
+          nombreCorto = data.nombre.split(' ')[0].slice(0, 5);
         }
         
         btn.innerHTML = `<span>${numStr}</span>${nombreCorto ? `<span class="ticket-name">${nombreCorto}</span>` : ''}`;
@@ -586,6 +575,45 @@
       document.getElementById('admin-block-num').value = '';
     }
     function adminLiberarNumero(num) { ocupadosRef.child(num).remove(); }
+
+    function buscarCompradorPorNumero() {
+      const input = document.getElementById('admin-buscar-num').value.trim();
+      const resContainer = document.getElementById('buscar-comprador-result');
+      resContainer.classList.remove('hidden');
+      if (!input) {
+        resContainer.className = "p-4 rounded-xl border bg-red-950/40 border-red-800 text-red-300 text-sm space-y-1";
+        resContainer.innerHTML = `<p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> Escribe un número para buscar.</p>`;
+        return;
+      }
+      const numFormatted = input.padStart(2, '0');
+      const data = occupiedNumbers[numFormatted];
+      if (!data || typeof data !== 'object' || !data.nombre) {
+        resContainer.className = "p-4 rounded-xl border bg-amber-950/40 border-amber-800 text-amber-300 text-sm space-y-1";
+        resContainer.innerHTML = `<p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> El número ${numFormatted} está libre, nadie lo ha reservado todavía.</p>`;
+        return;
+      }
+      const nombre = data.nombre;
+      const telefono = data.telefono || '';
+      const numerosPersona = Object.keys(occupiedNumbers).filter(num => {
+        const d = occupiedNumbers[num];
+        return d && typeof d === 'object' && d.nombre === nombre && d.telefono === telefono;
+      }).sort((a, b) => parseInt(a) - parseInt(b));
+
+      const chips = numerosPersona.map(num => {
+        const pag = estaPagado(occupiedNumbers[num]);
+        return `<span class="px-2.5 py-1 rounded-lg text-xs font-black border ${pag ? 'bg-red-950/40 border-red-800 text-white' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">${num}${pag ? ' ✓' : ''}</span>`;
+      }).join('');
+
+      resContainer.className = "p-4 rounded-xl border bg-emerald-950/40 border-emerald-800 text-emerald-200 text-sm space-y-3";
+      resContainer.innerHTML = `
+        <div class="flex items-center gap-2 font-bold text-emerald-400"><i class="fa-solid fa-user text-amber-400 text-lg"></i><span>Comprador encontrado</span></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-black/40 p-3 rounded-lg border border-emerald-800/50">
+          <p><strong class="text-gray-400">Nombre:</strong> <span class="text-white font-bold">${nombre}</span></p>
+          <p><strong class="text-gray-400">Teléfono:</strong> <span class="text-white font-bold">${telefono || 'N/A'}</span></p>
+        </div>
+        <p class="text-xs text-gray-400 font-semibold">Números que compró (${numerosPersona.length}) — ✓ = pagado:</p>
+        <div class="flex flex-wrap gap-2">${chips}</div>`;
+    }
 
     function buscarGanador() {
       const input = document.getElementById('admin-winner-num').value.trim();
