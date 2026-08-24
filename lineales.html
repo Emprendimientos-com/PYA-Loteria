@@ -241,6 +241,16 @@
           <div id="winner-result-lineales" class="hidden p-3.5 rounded-xl border"></div>
         </div>
 
+        <div class="bg-violet-500/5 border border-violet-500/30 rounded-2xl p-3.5 md:p-4 space-y-3">
+          <h4 class="text-sm font-black text-violet-400 flex items-center gap-2"><i class="fa-solid fa-user-magnifying-glass"></i> Buscar Comprador por Número</h4>
+          <div class="flex flex-col md:flex-row gap-3 items-end">
+            <div class="w-full md:w-1/2"><label class="block text-xs font-semibold text-gray-300 mb-1">Número jugado (00 a 99)</label><input type="text" id="admin-buscar-numero-lineales" placeholder="Ej: 07, 34, 88" maxlength="2" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
+            <button onclick="buscarCompradorPorNumeroLineal()" class="w-full md:w-auto bg-violet-500 hover:bg-violet-600 text-black font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-magnifying-glass"></i><span>Buscar</span></button>
+          </div>
+          <p class="text-[10px] text-gray-500">Escribe cualquier número jugado y aquí verás el nombre de la persona y TODAS sus filas con sus números.</p>
+          <div id="buscar-numero-result-lineales" class="hidden p-3.5 rounded-xl border"></div>
+        </div>
+
         <div class="bg-brand-card border border-violet-500/20 rounded-2xl p-3.5 md:p-4 space-y-3">
           <h4 class="text-sm font-black text-violet-300 flex items-center gap-2"><i class="fa-solid fa-book"></i> Historial de Ganadores — Lineales</h4>
           <div class="overflow-x-auto rounded-xl border border-gray-800">
@@ -384,20 +394,6 @@
       document.getElementById('lineales-stat-reservados').innerText = linealesReservados;
       document.getElementById('lineales-stat-vendidos').innerText = linealesVendidos;
 
-      // Agrupar filas por persona para evitar que se vean "regadas"
-      const gruposPorPersona = {};
-      Object.keys(linealesOcupados).forEach(filaKey => {
-        const data = linealesOcupados[filaKey];
-        if (data && typeof data === 'object' && data.nombre) {
-          const key = `${data.nombre}|${data.telefono}`;
-          if (!gruposPorPersona[key]) gruposPorPersona[key] = [];
-          gruposPorPersona[key].push(filaKey);
-        }
-      });
-      Object.keys(gruposPorPersona).forEach(key => {
-        gruposPorPersona[key].sort((a, b) => parseInt(a) - parseInt(b));
-      });
-
       const grid = document.getElementById('lineales-grid');
       grid.innerHTML = LINEALES_FILAS.map((_, idx) => {
         const filaKey = (idx + 1).toString().padStart(2, '0');
@@ -416,12 +412,7 @@
 
         let nombreCorto = '';
         if (isOccupied && typeof data === 'object' && data.nombre) {
-          const key = `${data.nombre}|${data.telefono}`;
-          const grupo = gruposPorPersona[key];
-          const esPrimero = grupo && grupo[0] === filaKey;
-          if (esPrimero || estado === 'pagado') {
-            nombreCorto = data.nombre.split(' ')[0].slice(0, 5);
-          }
+          nombreCorto = data.nombre.split(' ')[0].slice(0, 5);
         }
 
         const chips = nums.map(numStr => {
@@ -625,6 +616,66 @@
       document.getElementById('admin-block-fila').value = '';
     }
     function adminLiberarFila(filaKey) { linealesOcupadosRef.child(filaKey).remove(); }
+
+    function buscarCompradorPorNumeroLineal() {
+      const input = document.getElementById('admin-buscar-numero-lineales').value.trim();
+      const resContainer = document.getElementById('buscar-numero-result-lineales');
+      resContainer.classList.remove('hidden');
+      if (!input) {
+        resContainer.className = "p-3.5 rounded-xl border bg-red-950/40 border-red-800 text-red-300 text-sm space-y-1";
+        resContainer.innerHTML = `<p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> Escribe un número para buscar.</p>`;
+        return;
+      }
+      const numeroBuscado = input.padStart(2, '0');
+
+      // Buscar en qué fila está ese número
+      let filaEncontrada = null;
+      for (let idx = 0; idx < 25; idx++) {
+        const nums = getFilaNumeros(idx);
+        if (nums.includes(numeroBuscado)) { filaEncontrada = idx + 1; break; }
+      }
+      if (!filaEncontrada) {
+        resContainer.className = "p-3.5 rounded-xl border bg-red-950/40 border-red-800 text-red-300 text-sm space-y-1";
+        resContainer.innerHTML = `<p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> El número ${numeroBuscado} no existe en ninguna fila.</p>`;
+        return;
+      }
+
+      const filaKey = filaEncontrada.toString().padStart(2, '0');
+      const data = linealesOcupados[filaKey];
+      if (!data || typeof data !== 'object' || !data.nombre) {
+        resContainer.className = "p-3.5 rounded-xl border bg-amber-950/40 border-amber-800 text-amber-300 text-sm space-y-1";
+        resContainer.innerHTML = `<p class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> El número ${numeroBuscado} está en la fila ${filaEncontrada}, pero esa fila sigue libre, nadie la ha reservado.</p>`;
+        return;
+      }
+
+      const nombre = data.nombre;
+      const telefono = data.telefono || '';
+      const filasPersona = Object.keys(linealesOcupados).filter(fila => {
+        const d = linealesOcupados[fila];
+        return d && typeof d === 'object' && d.nombre === nombre && d.telefono === telefono;
+      }).sort((a, b) => parseInt(a) - parseInt(b));
+
+      const detalleFilas = filasPersona.map(fila => {
+        const idx = parseInt(fila, 10) - 1;
+        const nums = getFilaNumeros(idx).join('-');
+        const pag = estaPagado(linealesOcupados[fila]);
+        return `<div class="flex items-center gap-2 bg-black/40 p-2 rounded-lg border border-gray-800">
+          <span class="fila-numero-badge">${parseInt(fila, 10)}</span>
+          <span class="text-gray-300 text-xs flex-1">${nums}</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${pag ? 'bg-red-950/40 border border-red-800 text-white' : 'bg-violet-900/30 border border-violet-700 text-violet-300'}">${pag ? 'PAGADO' : 'RESERVADO'}</span>
+        </div>`;
+      }).join('');
+
+      resContainer.className = "p-3.5 rounded-xl border bg-emerald-950/40 border-emerald-800 text-emerald-200 text-sm space-y-3";
+      resContainer.innerHTML = `
+        <div class="flex items-center gap-2 font-bold text-emerald-400"><i class="fa-solid fa-user text-violet-400 text-lg"></i><span>Comprador encontrado</span></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-black/40 p-3 rounded-lg border border-emerald-800/50">
+          <p><strong class="text-gray-400">Nombre:</strong> <span class="text-white font-bold">${nombre}</span></p>
+          <p><strong class="text-gray-400">Teléfono:</strong> <span class="text-white font-bold">${telefono || 'N/A'}</span></p>
+        </div>
+        <p class="text-xs text-gray-400 font-semibold">Filas y números que compró (${filasPersona.length}):</p>
+        <div class="space-y-1.5">${detalleFilas}</div>`;
+    }
 
     function buscarGanadorLineal() {
       const input = document.getElementById('admin-winner-fila').value.trim();
