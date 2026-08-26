@@ -21,10 +21,20 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <style>
+    /* 🎯 VARIABLE PARA CONTROLAR EL TAMAÑO DE LOS NÚMEROS */
+    /* Cambia el valor 28px por 32px, 36px, etc., para hacerlos más grandes */
+    :root {
+      --tam-numero: 28px;
+    }
+    .numero-grande {
+      font-size: var(--tam-numero) !important;
+      line-height: 1;
+    }
+
     .glassmorphism { background: rgba(18, 20, 28, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
     .glow-gold { box-shadow: 0 0 25px -5px rgba(251, 191, 36, 0.2); }
     .grid-pattern { background-size: 30px 30px; background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px); }
-    .ticket-name { font-size: 7px; line-height: 1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ticket-name { font-size: 9px; line-height: 1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; color: white; }
     @keyframes pulse-banner { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
     .banner-fallback { animation: pulse-banner 2.4s ease-in-out infinite; }
     @keyframes flash-badge { 0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.6); } 50% { box-shadow: 0 0 0 6px rgba(251,191,36,0); } }
@@ -102,17 +112,23 @@
       </div>
     </div>
 
+    <!-- HORA DEL SORTEO - VISIBLE PARA TODOS -->
+    <div id="hora-sorteo-publico" class="hidden bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-center py-3 px-4 rounded-xl shadow-lg shadow-amber-500/20 mb-4 md:mb-6 items-center justify-center gap-2 text-sm md:text-base">
+      <i class="fa-regular fa-clock"></i> Hora del sorteo: <span id="public-hora-texto"></span>
+    </div>
+
     <section class="bg-brand-card/50 border border-amber-500/20 rounded-xl p-3.5 md:p-4 text-center space-y-1">
       <p class="text-amber-400 font-black text-xs md:text-sm tracking-wide">MEDIOS DE PAGO 💰</p>
       <p class="text-xs md:text-sm text-gray-200 font-semibold">NEQUI: <span class="text-white font-black">3235532989</span> <span class="text-gray-600 mx-1">|</span> DAVIPLATA: <span class="text-white font-black">3235532989</span></p>
       <p class="text-[10px] md:text-[11px] text-gray-500">Comprobantes al interno, gracias.</p>
     </section>
 
+    <!-- LEYENDA DE COLORES SÓLIDOS -->
     <section class="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-xs text-gray-400 bg-brand-card/50 p-3 md:p-4 rounded-xl border border-gray-800/60">
-      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-brand-card border border-gray-700"></span><span>Disponible</span></div>
-      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-amber-500 shadow-sm shadow-amber-500"></span><span class="text-amber-400 font-medium">Seleccionado</span></div>
-      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-amber-900/50 border border-amber-700"></span><span class="text-amber-300">Reservado (sin pagar)</span></div>
-      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-red-950 border border-red-800 opacity-60"></span><span class="text-red-400">Vendido / Pagado</span></div>
+      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-emerald-600 border border-emerald-500"></span><span class="text-white font-medium">Disponible</span></div>
+      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-blue-600 border border-blue-500"></span><span class="text-white font-medium">Seleccionado</span></div>
+      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-orange-500 border border-orange-400"></span><span class="text-white font-medium">Reservado (sin pagar)</span></div>
+      <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-md bg-red-600 border border-red-500"></span><span class="text-white font-medium">Vendido / Pagado</span></div>
     </section>
 
     <section><div id="grid-numeros" class="grid grid-cols-[repeat(auto-fill,minmax(55px,1fr))] sm:grid-cols-10 gap-2 md:gap-3.5"></div></section>
@@ -183,6 +199,7 @@
           <div><label class="block text-xs font-semibold text-gray-300 mb-1">Precio por boleta</label><input type="text" id="cfg-precio" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
           <div><label class="block text-xs font-semibold text-gray-300 mb-1">Fecha</label><input type="text" id="cfg-fecha" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
           <div><label class="block text-xs font-semibold text-gray-300 mb-1">Lugar / Lotería</label><input type="text" id="cfg-ubicacion" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
+          <div><label class="block text-xs font-semibold text-gray-300 mb-1">Hora del sorteo</label><input type="time" id="cfg-hora" class="w-full bg-black/60 border border-gray-700/80 rounded-xl p-2.5 text-sm text-white"></div>
           <div class="md:col-span-2 space-y-2">
             <label class="block text-xs font-semibold text-gray-300 mb-1">Banner (foto o GIF)</label>
             <div class="flex items-center gap-3">
@@ -279,9 +296,9 @@
         <button onclick="cerrarTalonarioDetalle()" class="text-gray-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <div class="flex flex-wrap items-center gap-4 text-[11px] text-gray-400 bg-black/30 p-3 rounded-xl border border-gray-800/60">
-        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-brand-card border border-gray-700"></span><span>No vendida</span></div>
-        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-amber-900/50 border border-amber-700"></span><span class="text-amber-300">Reservado</span></div>
-        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-red-950 border border-red-800"></span><span class="text-red-400">Vendido</span></div>
+        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-emerald-600 border border-emerald-500"></span><span class="text-white">Disponible</span></div>
+        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-orange-500 border border-orange-400"></span><span class="text-white">Reservado</span></div>
+        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md bg-red-600 border border-red-500"></span><span class="text-white">Vendido</span></div>
       </div>
       <div id="talonario-detalle-grid" class="grid grid-cols-[repeat(auto-fill,minmax(52px,1fr))] gap-2"></div>
       <div class="pt-2">
@@ -300,7 +317,7 @@
     const ADMIN_WHATSAPP = '573224943553';
     let selectedNumbers = [];
     let occupiedNumbers = {};
-    let raffleConfig = { titulo: 'PYA Sorteos', precio: '', fecha: '', ubicacion: '', banner: '', premios: [{ label: 'Dos últimas', valor: '50.000' }, { label: 'Dos primeras', valor: '20.000' }, { label: 'Dos del medio', valor: '10.000' }] };
+    let raffleConfig = { titulo: 'PYA Sorteos', precio: '', fecha: '', ubicacion: '', hora: '', banner: '', premios: [{ label: 'Dos últimas', valor: '50.000' }, { label: 'Dos primeras', valor: '20.000' }, { label: 'Dos del medio', valor: '10.000' }] };
     const ADMIN_USER_B64 = 'UFlBYWRtaW4yNg==';
     const ADMIN_PASS_B64 = 'QURNSU5weWEyNg==';
 
@@ -350,6 +367,18 @@
       document.getElementById('stat-libres').innerText = 100 - keys.length;
     }
 
+    function renderHora() {
+      const horaEl = document.getElementById('hora-sorteo-publico');
+      const horaTexto = document.getElementById('public-hora-texto');
+      if (raffleConfig.hora) {
+        horaEl.classList.remove('hidden');
+        horaEl.classList.add('flex');
+        horaTexto.innerText = raffleConfig.hora;
+      } else {
+        horaEl.classList.add('hidden');
+      }
+    }
+
     function renderHero() {
       document.getElementById('config-titulo').innerText = raffleConfig.titulo || 'PYA Rifas';
       document.getElementById('config-fecha').innerHTML = raffleConfig.fecha ? `<i class="fa-regular fa-calendar text-amber-400"></i> ${raffleConfig.fecha}` : '';
@@ -377,13 +406,13 @@
         
         const btn = document.createElement('button');
         btn.disabled = isOccupied;
-        let baseStyle = "h-11 sm:h-12 md:h-14 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all flex flex-col items-center justify-center border shadow-sm leading-none gap-0.5 ";
+        let baseStyle = "h-11 sm:h-12 md:h-14 rounded-xl sm:rounded-2xl font-black transition-all flex flex-col items-center justify-center border shadow-sm leading-none gap-0.5 ";
         
-        // TEXTO BLANCO para pagados
-        if (isPaid) baseStyle += "bg-red-950/30 border-red-900/50 text-white cursor-not-allowed opacity-80";
-        else if (isOccupied) baseStyle += "bg-amber-900/30 border-amber-700/50 text-amber-400 cursor-not-allowed opacity-75";
-        else if (isSelected) baseStyle += "bg-gradient-to-tr from-amber-500 to-amber-400 border-amber-300 text-black shadow-lg shadow-amber-500/30 scale-105 z-10";
-        else baseStyle += "bg-brand-card border-gray-800 hover:border-amber-500/50 hover:text-amber-400 text-gray-300 hover:scale-105";
+        // COLORES SÓLIDOS E INTENSOS
+        if (isPaid) baseStyle += "bg-red-600 border-red-500 text-white cursor-not-allowed";
+        else if (isOccupied) baseStyle += "bg-orange-500 border-orange-400 text-white cursor-not-allowed";
+        else if (isSelected) baseStyle += "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/30 scale-105 z-10";
+        else baseStyle += "bg-emerald-600 border-emerald-500 text-white hover:scale-105";
         
         btn.className = baseStyle;
         
@@ -392,7 +421,8 @@
           nombreCorto = data.nombre.split(' ')[0].slice(0, 5);
         }
         
-        btn.innerHTML = `<span>${numStr}</span>${nombreCorto ? `<span class="ticket-name">${nombreCorto}</span>` : ''}`;
+        // NÚMEROS MÁS GRANDES (usando la clase .numero-grande controlada por CSS variable)
+        btn.innerHTML = `<span class="numero-grande">${numStr}</span>${nombreCorto ? `<span class="ticket-name text-white font-bold">${nombreCorto}</span>` : ''}`;
         btn.onclick = () => toggleNumberSelection(numStr);
         grid.appendChild(btn);
       }
@@ -411,7 +441,7 @@
       const list = document.getElementById('selected-numbers-list');
       if (selectedNumbers.length > 0) {
         cartBar.classList.remove('translate-y-full');
-        list.innerHTML = selectedNumbers.map(n => `<span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold px-2 py-0.5 rounded-lg text-[10px] md:text-xs">${n}</span>`).join('');
+        list.innerHTML = selectedNumbers.map(n => `<span class="bg-blue-600 text-white border border-blue-500 font-bold px-2 py-0.5 rounded-lg text-[10px] md:text-xs">${n}</span>`).join('');
       } else {
         cartBar.classList.add('translate-y-full');
       }
@@ -522,13 +552,13 @@
         const tr = document.createElement('tr');
         tr.className = "border-b border-gray-800/60 hover:bg-gray-900/40";
         tr.innerHTML = `
-          <td class="p-3 md:p-4 font-black text-amber-400 text-sm md:text-base">${num}</td>
+          <td class="p-3 md:p-4 font-black text-white text-sm md:text-base bg-gray-800 rounded">${num}</td>
           <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${cliente}</td>
           <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${telefono}</td>
-          <td class="p-3 md:p-4"><span class="px-2 py-1 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-950/40 border-red-800 text-white' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">${pagado ? 'PAGADO' : 'RESERVADO'}</span></td>
+          <td class="p-3 md:p-4"><span class="px-2 py-1 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-600 border-red-500 text-white' : 'bg-orange-500 border-orange-400 text-white'}">${pagado ? 'PAGADO' : 'RESERVADO'}</span></td>
           <td class="p-3 md:p-4 flex flex-wrap gap-2">
-            <button onclick="adminTogglePagado('${num}')" class="${pagado ? 'bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-400 border-amber-500/30' : 'bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 border-red-500/30'} border px-2.5 py-1 rounded-lg text-xs font-bold transition-all">${pagado ? 'Marcar Reservado' : 'Ya Pagó'}</button>
-            <button onclick="adminLiberarNumero('${num}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-black border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Liberar</button>
+            <button onclick="adminTogglePagado('${num}')" class="${pagado ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-500' : 'bg-red-600 hover:bg-red-700 text-white border-red-500'} border px-2.5 py-1 rounded-lg text-xs font-bold transition-all">${pagado ? 'Marcar Reservado' : 'Ya Pagó'}</button>
+            <button onclick="adminLiberarNumero('${num}')" class="bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Liberar</button>
           </td>`;
         tbody.appendChild(tr);
       });
@@ -601,7 +631,7 @@
 
       const chips = numerosPersona.map(num => {
         const pag = estaPagado(occupiedNumbers[num]);
-        return `<span class="px-2.5 py-1 rounded-lg text-xs font-black border ${pag ? 'bg-red-950/40 border-red-800 text-white' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">${num}${pag ? ' ✓' : ''}</span>`;
+        return `<span class="px-2.5 py-1 rounded-lg text-xs font-black border ${pag ? 'bg-red-600 border-red-500 text-white' : 'bg-orange-500 border-orange-400 text-white'}">${num}${pag ? ' ✓' : ''}</span>`;
       }).join('');
 
       resContainer.className = "p-4 rounded-xl border bg-emerald-950/40 border-emerald-800 text-emerald-200 text-sm space-y-3";
@@ -662,11 +692,11 @@
       tbody.innerHTML = entries.map(([key, g]) => `
         <tr class="border-b border-gray-800/60 hover:bg-gray-900/40">
           <td class="p-3 md:p-4 text-white font-medium text-xs md:text-sm">${g.sorteo || '-'}</td>
-          <td class="p-3 md:p-4 font-black text-amber-400 text-sm">${g.numero || '-'}</td>
+          <td class="p-3 md:p-4 font-black text-white bg-gray-800 rounded px-2 py-1 text-sm">${g.numero || '-'}</td>
           <td class="p-3 md:p-4 text-white text-xs md:text-sm">${g.nombre || '-'}</td>
           <td class="p-3 md:p-4 text-gray-400 text-xs md:text-sm">${g.telefono || 'N/A'}</td>
           <td class="p-3 md:p-4 text-gray-400 text-xs">${g.fecha || '-'}</td>
-          <td class="p-3 md:p-4"><button onclick="eliminarGanador('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Borrar</button></td>
+          <td class="p-3 md:p-4"><button onclick="eliminarGanador('${key}')" class="bg-red-600 hover:bg-red-700 text-white border border-red-500 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Borrar</button></td>
         </tr>`).join('');
     }
 
@@ -682,8 +712,8 @@
           <td class="p-3 md:p-4 text-gray-400 text-xs">${t.fechaGuardado || '-'}</td>
           <td class="p-3 md:p-4 text-amber-400 font-bold text-sm">${cantidad}</td>
           <td class="p-3 md:p-4 flex flex-wrap gap-2">
-            <button onclick="verTalonario('${key}')" class="bg-indigo-500/10 hover:bg-indigo-500 text-indigo-300 hover:text-white border border-indigo-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Ver</button>
-            <button onclick="eliminarTalonario('${key}')" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Borrar</button>
+            <button onclick="verTalonario('${key}')" class="bg-indigo-600 hover:bg-indigo-700 text-white border border-indigo-500 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Ver</button>
+            <button onclick="eliminarTalonario('${key}')" class="bg-red-600 hover:bg-red-700 text-white border border-red-500 px-2.5 py-1 rounded-lg text-xs font-bold transition-all">Borrar</button>
           </td></tr>`;
       }).join('');
     }
@@ -710,12 +740,12 @@
         const data = numeros[numStr];
         const isOccupied = !!data;
         const isPaid = estaPagado(data);
-        let style = "h-11 sm:h-12 rounded-xl font-black text-xs transition-all flex flex-col items-center justify-center border shadow-sm leading-none gap-0.5 ";
-        if (isPaid) style += "bg-red-950/40 border-red-800 text-white";
-        else if (isOccupied) style += "bg-amber-900/40 border-amber-700 text-amber-300";
-        else style += "bg-brand-card border-gray-800 text-gray-500";
+        let style = "h-11 sm:h-12 rounded-xl font-black transition-all flex flex-col items-center justify-center border shadow-sm leading-none gap-0.5 ";
+        if (isPaid) style += "bg-red-600 border-red-500 text-white";
+        else if (isOccupied) style += "bg-orange-500 border-orange-400 text-white";
+        else style += "bg-emerald-600 border-emerald-500 text-white";
         const nombreCorto = (isOccupied && typeof data === 'object' && data.nombre) ? data.nombre.split(' ')[0].slice(0, 5) : '';
-        gridHtml += `<div class="${style}"><span>${numStr}</span>${nombreCorto ? `<span class="ticket-name">${nombreCorto}</span>` : ''}</div>`;
+        gridHtml += `<div class="${style}"><span class="numero-grande">${numStr}</span>${nombreCorto ? `<span class="ticket-name text-white font-bold">${nombreCorto}</span>` : ''}</div>`;
       }
       grid.innerHTML = gridHtml;
       const body = document.getElementById('talonario-detalle-body');
@@ -727,10 +757,10 @@
           const telefono = (typeof data === 'object') ? (data.telefono || 'N/A') : 'N/A';
           const pagado = estaPagado(data);
           return `<tr class="border-b border-gray-800/60">
-            <td class="p-2.5 font-black text-amber-400">${num}</td>
+            <td class="p-2.5 font-black text-white bg-gray-800 rounded px-2 py-1">${num}</td>
             <td class="p-2.5 text-white">${nombre}</td>
             <td class="p-2.5 text-gray-400">${telefono}</td>
-            <td class="p-2.5"><span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-950/40 border-red-800 text-white' : 'bg-amber-900/30 border-amber-700 text-amber-300'}">${pagado ? 'PAGADO' : 'RESERVADO'}</span></td></tr>`;
+            <td class="p-2.5"><span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border ${pagado ? 'bg-red-600 border-red-500 text-white' : 'bg-orange-500 border-orange-400 text-white'}">${pagado ? 'PAGADO' : 'RESERVADO'}</span></td></tr>`;
         }).join('');
       }
       document.getElementById('modal-talonario-detalle').classList.remove('hidden');
@@ -744,6 +774,7 @@
       document.getElementById('cfg-precio').value = raffleConfig.precio || '';
       document.getElementById('cfg-fecha').value = raffleConfig.fecha || '';
       document.getElementById('cfg-ubicacion').value = raffleConfig.ubicacion || '';
+      document.getElementById('cfg-hora').value = raffleConfig.hora || ''; // <-- HORA
       const bannerVal = raffleConfig.banner || '';
       document.getElementById('cfg-banner').value = bannerVal;
       document.getElementById('cfg-banner-file').value = '';
@@ -780,7 +811,7 @@
       document.getElementById('cfg-banner-preview').classList.add('hidden');
       document.getElementById('cfg-banner-preview-empty').classList.remove('hidden');
     }
-        function handleBannerFile(e) {
+    function handleBannerFile(e) {
       const file = e.target.files[0];
       if (!file) return;
       const statusEl = document.getElementById('cfg-banner-status');
@@ -831,6 +862,7 @@
         precio: document.getElementById('cfg-precio').value.trim(),
         fecha: document.getElementById('cfg-fecha').value.trim(),
         ubicacion: document.getElementById('cfg-ubicacion').value.trim(),
+        hora: document.getElementById('cfg-hora').value.trim(), // <-- GUARDAR HORA
         banner: document.getElementById('cfg-banner').value.trim(),
         premios: (raffleConfig.premios || []).filter(p => p.label || p.valor)
       });
@@ -865,6 +897,7 @@
         if (!Array.isArray(raffleConfig.premios) || raffleConfig.premios.length === 0) raffleConfig.premios = [];
       }
       renderHero();
+      renderHora(); // <-- RENDERIZAR HORA PÚBLICA
       if (!document.getElementById('modal-admin-dashboard').classList.contains('hidden')) cargarConfigEnFormulario();
       datosCargados = true;
       verificarYMostrarContenido();
@@ -874,6 +907,7 @@
     talonariosRef.on('value', (snapshot) => { talonariosData = snapshot.val() || {}; renderTalonariosTable(); });
 
     renderHero();
+    renderHora();
     renderGrid();
   </script>
 </body>
